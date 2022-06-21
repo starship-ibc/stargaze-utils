@@ -15,10 +15,13 @@ class Sg721Info:
         return f'"{self.sg721}","{self.name}","{self.symbol}","{self.minter}"'
 
     def __repr__(self):
-        return f"<{self.name} ({self.symbol}) sg721={self.sg721} minter={self.minter}>"
+        name = self.name or "None"
+        symbol = self.symbol or "None"
+        minter = self.minter or "None"
+        return f"<{name} ({symbol}) sg721={self.sg721} minter={minter}>"
 
     def __str__(self):
-        return self.name
+        return self.name or "<None>"
 
     @classmethod
     def parse_csv_row(cls, line):
@@ -27,7 +30,10 @@ class Sg721Info:
         except ValueError as e:
             LOG.warning(f"Error processing line {e}: {line}")
             raise e
-        return cls(sg721_addr[1:], name, symbol, minter[:-2])
+        name = name or None
+        symbol = symbol or None
+        minter = minter[:-2] or None
+        return cls(sg721_addr[1:], name, symbol, minter)
 
 
 class Sg721Cache:
