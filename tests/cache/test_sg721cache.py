@@ -1,6 +1,8 @@
 import os
 import shutil
 
+import pytest
+
 from stargazeutils.cache import Sg721Cache, Sg721Info
 from tests.assets import test_sg721_cache_csv_path
 
@@ -18,6 +20,30 @@ def test_sg721_info_should_parse_csv_row():
     assert info.name == "name"
     assert info.symbol == "symbol"
     assert info.minter == "minter"
+
+
+def test_sg721_info_can_be_represented_for_debugging():
+    row = '"addr","name","symbol","minter"\n'
+    info = Sg721Info.parse_csv_row(row)
+    assert info.name in info.__repr__()
+
+
+def test_sg721_info_given_invalid_row_should_raise_exception():
+    row = '"invalidrow"'
+    with pytest.raises(ValueError):
+        Sg721Info.parse_csv_row(row)
+    assert True
+
+
+def test_sg721_cache_should_create_csv_when_not_exists():
+    filename = "testcache.tmp"
+    assert not os.path.exists(filename)
+
+    cache = Sg721Cache(filename)
+    cache.save_csv()
+
+    assert os.path.exists(filename)
+    os.remove(filename)
 
 
 def test_sg721_cache_should_load_csv():
@@ -66,6 +92,11 @@ def test_sg721_cache_not_has_sg721_info_should_return_false():
     assert not cache.has_sg721_info("nothere")
 
 
+def test_sg721_cache_given_only_minter_has_sg721_info_should_return_false():
+    cache = Sg721Cache(test_sg721_cache_csv_path)
+    assert not cache.has_sg721_info("onlyminter")
+
+
 def test_sg721_cache_has_minter_should_return_true():
     cache = Sg721Cache(test_sg721_cache_csv_path)
     assert cache.has_sg721_minter("addr1")
@@ -76,9 +107,19 @@ def test_sg721_cache_not_has_minter_should_return_false():
     assert not cache.has_sg721_minter("nothere")
 
 
+def test_sg721_cache_given_only_info_has_minter_should_return_false():
+    cache = Sg721Cache(test_sg721_cache_csv_path)
+    assert not cache.has_sg721_minter("onlyinfo")
+
+
 def test_sg721_cache_has_complete_data_should_return_true():
     cache = Sg721Cache(test_sg721_cache_csv_path)
     assert cache.has_complete_data("addr1")
+
+
+def test_sg721_cache_given_unknown_has_complete_data_should_return_false():
+    cache = Sg721Cache(test_sg721_cache_csv_path)
+    assert not cache.has_complete_data("notthere")
 
 
 def test_sg721_cache_no_info_has_complete_data_should_return_false():

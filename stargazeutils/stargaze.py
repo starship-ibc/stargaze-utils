@@ -23,13 +23,13 @@ class StargazeClient:
         chain_id="stargaze",
         rest_url="https://rest.stargaze-apis.com",
         query_method: QueryMethod = QueryMethod.BINARY,
-        sg721_cache: Sg721Cache = Sg721Cache(),
+        sg721_cache: Sg721Cache = None,
     ):
         self.node = node
         self.chain_id = chain_id
         self.rest_url = rest_url
         self.query_method = query_method
-        self._sg721_cache = sg721_cache
+        self._sg721_cache = sg721_cache or Sg721Cache()
 
         self._query_suffix = ["--node", self.node, "--chain-id", self.chain_id]
         self._execute_suffix = [
@@ -44,7 +44,8 @@ class StargazeClient:
     @staticmethod
     def _get_json(cmd):
         LOG.debug(f"Executing <{' '.join(cmd)}>")
-        return json.loads(subprocess.check_output(cmd))
+        output = subprocess.check_output(cmd)
+        return json.loads(output)
 
     def _query_rest_contract(self, contract: str, query: dict):
         encoded_query = base64.b64encode(json.dumps(query).encode()).decode()
@@ -52,23 +53,10 @@ class StargazeClient:
             f"{self.rest_url}/cosmwasm/wasm/v1/"
             + f"contract/{contract}/smart/{encoded_query}"
         )
-
+        print(f"url = {url}")
         return requests.get(url).json()
 
-    def execute_contract(self, contract: str, execution: dict, from_addr: str):
-        cmd = [
-            "starsd",
-            "tx",
-            "wasm",
-            contract,
-            json.dumps(execution),
-            "--from",
-            from_addr,
-            "--ledger",
-        ] + self._execute_suffix
-        print(" ".join(cmd))
-
-    def query_contract(self, contract: str, query: dict):
+    def query_contract(self, contract: str, query: dict) -> dict:
         if self.query_method is QueryMethod.BINARY:
             cmd = [
                 "starsd",
@@ -81,7 +69,7 @@ class StargazeClient:
             ] + self._query_suffix
             return StargazeClient._get_json(cmd)
 
-        return StargazeClient._query_rest_contract(contract, query)
+        return self._query_rest_contract(contract, query)
 
     def query_txs(self, params: dict):
         url = f"{self.rest_url}/txs"
@@ -101,6 +89,7 @@ class StargazeClient:
         ] + self._query_suffix
         contracts = []
         new_contracts = StargazeClient._get_json(cmd)["contracts"]
+
         while len(new_contracts) > 0:
             contracts.extend(new_contracts)
             page += 1
@@ -116,9 +105,9 @@ class StargazeClient:
             new_contracts = StargazeClient._get_json(cmd)["contracts"]
         return contracts
 
-    def fetch_sg721_contract_info(self, sg721) -> Sg721Info:
+    def fetch_sg721_contract_info(self, sg721: str) -> Sg721Info:
         if self._sg721_cache.has_sg721_info(sg721):
-            return self._sg721_cache.get_sg721_info[sg721]
+            return self._sg721_cache.get_sg721_info(sg721)
         data = self.query_contract(sg721, {"contract_info": {}})["data"]
         return self._sg721_cache.update_sg721_contract_info(sg721, data)
 

@@ -61,9 +61,6 @@ class Sg721Cache:
         LOG.info(f"Loaded {len(lines)} collections")
 
     def save_csv(self):
-        if self._sg721 is None:
-            return None
-
         with open(self.cache_file, "w") as f:
             LOG.info(f"Saving {len(self._sg721)} collections")
             for info in self._sg721.values():
