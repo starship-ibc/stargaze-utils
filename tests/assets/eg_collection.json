@@ -1,0 +1,6 @@
+[
+    {"id": 1, "Color": "blue", "Type": "electric"},
+    {"id": 2, "Color": "blue", "Type": "water"},
+    {"id": 3, "Color": "red", "Type": "fire"},
+    {"id": 4, "Color": "yellow", "Type": "electric"}
+]
