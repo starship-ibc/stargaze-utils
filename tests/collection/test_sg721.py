@@ -1,234 +1,185 @@
+from tests.mock_response import MockResponse
 from unittest import mock
 
 from stargazeutils.collection import Sg721Client
+from stargazeutils.collection.collection_info import CollectionInfo
+from stargazeutils.collection.minter_config import MinterConfig
+from stargazeutils.collection.whitelist import Whitelist
+from ..assets import test_rarity, test_token_metadata, test_token_traits, test_sg721_addr, test_minter_addr, test_whitelist_addr, test_owner, test_sg721_contract_info_data, test_minter_config_data, test_collection_info_data, test_whitelist_data
 
 
 @mock.patch("stargazeutils.StargazeClient")
-def test_sg721_fetch_tokens_owned_by_should_return_tokens(sg_client):
-    sg721 = "sg721"
-    owner = "owner"
-    client = Sg721Client(sg721, "minter", sg_client)
+def test_sg721_client_should_fetch_tokens_owned_by(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
 
     sg_client.query_contract.return_value = {"data": {"tokens": [1, 2, 3]}}
-    tokens = client.fetch_tokens_owned_by(owner)
+    tokens = client.fetch_tokens_owned_by(test_owner)
 
-    sg_client.query_contract.assert_called_with(sg721, {"tokens": {"owner": owner}})
+    sg_client.query_contract.assert_called_with(test_sg721_addr, {"tokens": {"owner": test_owner}})
     assert tokens == [1, 2, 3]
 
-    # def fetch_tokens_owned_by(self, owner):
-    #     return self.query_sg721({"tokens": {"owner": owner}})['tokens']
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_query_minter_given_none(sg_client):
+    sg_client.fetch_sg721_minter.return_value = test_minter_addr
+    client = Sg721Client(test_sg721_addr, sg_client=sg_client)
+    assert client.minter == test_minter_addr
 
-    # def query_minter_config(self) -> MinterConfig:
-    #     if self._minter_config is None:
-    #         self._minter_config = MinterConfig(self.query_minter({'config': {}}))
-    #     return self._minter_config
 
-    # def query_collection_info(self) -> CollectionInfo:
-    #     if self._collection_info is None:
-    #         data = self.query_sg721({"collection_info": {}})
-    #         self._collection_info = CollectionInfo.from_data(data)
-    #     return self._collection_info
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_query_minter_config_once(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
 
-    # def query_whitelist(self) -> Whitelist:
-    #     if self._whitelist_config is None:
-    #         wl_contract = self.query_minter_config().whitelist
-    #         if wl_contract is None:
-    #             return None
-    #         self._whitelist_config = Whitelist(s...{'config': {}})['data'])
-    #     return self._whitelist_config
+    expected_minter_config = MinterConfig.from_data(test_minter_config_data)
+    sg_client.query_contract.return_value = {"data": test_minter_config_data}
 
-    # def fetch_minter(self) -> str:
-    #     return self.query_sg721({'minter': {}})['minter']
+    minter_config = client.query_minter_config()
+    assert minter_config == expected_minter_config
 
-    # def fetch_minted_tokens(self, start_after: str = '0', limit=30):
-    #     minted_tokens = []
-    #     tokens = self.query_sg721({"all_tokens": {"start_after": start_after, \
-    #       "limit": limit}})['tokens']
-    #     while len(tokens) == limit:
-    #         start_after = tokens[-1]
-    #         LOG.debug(f"Fetching more tokens after {start_after}")
-    #         minted_tokens += tokens
-    #         tokens = self.query_sg721({"all_tokens": \
-    #               {"start_after": start_after, "limit": limit}})['tokens']
-    #     minted_tokens += tokens
-    #     return minted_tokens
+    minter_config = client.query_minter_config()
+    assert minter_config == expected_minter_config
+    sg_client.query_contract.assert_called_once_with(test_minter_addr, {"config": {}})
 
-    # def fetch_owner_of_token(self, token_id):
-    #     return self.query_sg721({"owner_of": {"token_id": str(token_id)}})
 
-    # def fetch_num_minted_tokens(self):
-    #     return self.query_sg721({"num_tokens": {}})['count']
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_query_collection_info_once(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
 
-    # def query_contract_info(self):
-    #     return self.query_sg721({'contract_info': {}})
+    expected_collection_info = CollectionInfo.from_data(test_collection_info_data)
+    sg_client.query_contract.return_value = {"data": test_collection_info_data}
+
+    collection_info = client.query_collection_info()
+    assert collection_info == expected_collection_info
+
+    collection_info = client.query_collection_info()
+    assert collection_info == expected_collection_info
+    sg_client.query_contract.assert_called_once_with(test_sg721_addr, {"collection_info": {}})
+
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_query_whitelist_once(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+    client._minter_config = MinterConfig.from_data(test_minter_config_data)
+
+    expected_whitelist = Whitelist.from_data(test_whitelist_data)
+    sg_client.query_contract.return_value = {"data": test_whitelist_data}
+
+    whitelist = client.query_whitelist()
+    assert whitelist == expected_whitelist
+
+    whitelist = client.query_whitelist()
+    assert whitelist == expected_whitelist
+    sg_client.query_contract.assert_called_once_with(test_whitelist_addr, {"config": {}})
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_given_no_whitelist_when_query_whitelist_return_none(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+    client._minter_config = MinterConfig.from_data(test_minter_config_data)
+    client._minter_config.whitelist = None
+
+    whitelist = client.query_whitelist()
+    assert whitelist is None
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_minted_tokens(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+    sg_client.query_contract.side_effect = [
+        {"data": {"tokens": [1, 2, 3]}},
+        {"data": {"tokens": [4, 5, 6]}},
+        {"data": {"tokens": []}},
+    ]
+
+    tokens = client.fetch_minted_tokens(limit=3)
+    assert tokens == [1, 2, 3, 4, 5, 6]
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_token_owner(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+
+    sg_client.query_contract.return_value = {"data": {"owner": test_owner}}
+
+    owner = client.fetch_owner_of_token(1)
+    assert owner == test_owner
+
+    sg_client.query_contract.assert_called_once_with(test_sg721_addr, {"owner_of": {"token_id": "1"}})
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_num_minted(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+
+    sg_client.query_contract.return_value = {"data": {"count": 3}}
+
+    assert client.fetch_num_minted_tokens() == 3
+    sg_client.query_contract.assert_called_once_with(test_sg721_addr, {"num_tokens": {}})
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_query_contract_info(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+
+    sg_client.query_contract.return_value = {"data": test_sg721_contract_info_data}
+
+    contract_info = client.query_contract_info()
+    assert contract_info == test_sg721_contract_info_data
+
+    sg_client.query_contract.assert_called_once_with(test_sg721_addr, {"contract_info": {}})
 
     # def query_nft_info(self, token_id: str):
     #     return self.query_sg721({'all_nft_info': {'token_id': token_id}})
 
-    # def create_mintable_list(self, count=None):
-    #     if count is None:
-    #         count = self.query_minter_config().num_tokens
+# @mock.patch("stargazeutils.StargazeClient")
+# def test_sg721_client_should_create_minted_tokens_list(sg_client):
+#     client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+#     client._minter_config = MinterConfig.from_data(test_minter_config_data)
+#     client._minter_config.num_tokens = 5
 
-    #     return sorted([x for x in range(1,count+1)])
+#     minted_tokens = client.create_minted_tokens_list()
+#     assert minted_tokens == [1, 2, 3, 4, 5]
 
-    # def fetch_holders(self):
-    #     tokens = self.fetch_minted_tokens()
-    #     holders = set()
-    #     for token in tokens:
-    #         if len(tokens) > 1000 and int(token) % 10 == 0:
-    #             print(f"Fetching owner for token {token}")
-    #         owner = self.query_sg721({"owner_of": {"token_id": token}})['owner']
-    #         # print(owner)
-    #         holders.add(owner)
-    #     return holders
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_holders(sg_client):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
 
-    # def watch_mint(self, target_id=None):
-    #     # minted_tokens = self.fetch_minted_tokens()
-    #     # num_minted = len(minted_tokens)
-    #     num_tokens = self.query_minter_config().num_tokens
-    #     # available_tokens = self.create_mintable_list(num_tokens)
-    #     # for token in minted_tokens:
-    #     #     available_tokens.remove(int(token))
-    #     num_minted = self.fetch_num_minted_tokens()
-    #     next_available = num_minted
-    #     print('\007')
-    #     last_minted_time = datetime.now()
-    #     print(f"Next available: {next_available} Targeting token {target_id}")
-    #     # safari = webdriver.Safari()
-    #     while num_minted < num_tokens:
-    #         new_num_minted = self.fetch_num_minted_tokens()
-    #         if next_available == int(target_id):
-    #             print("!!! MINT 1 NOW !!!")
-    #             print('\007'*10)
-    #         if next_available + 20 == int(target_id):
-    #             print("!!! 20 UP !!! ")
-    #             print('\007'*2)
-    #         if next_available > int(target_id):
-    #             print(" xxx missed it xxxx ")
-    #             print(f" next available is {next_available}")
-    #             break
-    #         if new_num_minted > num_minted:
-    #             print('\007')
-    #             num_minted = new_num_minted
-    #             next_available = num_minted
-    #             image_url = f"https://{base_ifps}.ipfs.dweb.link/{next_available}.png"
-    #             # safari.get(image_url)
+    sg_client.query_contract.side_effect = [
+        {"data": {"tokens": [1, 2, 3]}},
+        {"data": {"owner": "owner1", "approvals": []}},
+        {"data": {"owner": "owner2", "approvals": []}},
+        {"data": {"owner": "owner1", "approvals": []}}
+    ]
 
-    #             new_num_minted = self.fetch_num_minted_tokens()
-    #             now = datetime.now()
-    #             mint_delta = now - last_minted_time
-    #             last_minted_time = now
-    #             # mint_check = self.fetch_minted_tokens()
-    #             # for token in mint_check:
-    #             #     if token in available_tokens:
-    #             #         available_tokens.remove(token)
-    #             # next_available = available_tokens[0]
-    #             print(f"\n{now} Minting next = {next_available} {image_url}")
-    #             print(f"Time since last mint = {mint_delta}")
-    #             traits = self.fetch_traits_for_token(next_available)
-    #             pprint(traits)
-    #         if target_id is not None and int(target_id) - num_minted > 100:
-    #             time.sleep(20)
-    #         n = datetime.now().strftime('%I:%M:%S')
-    #         print(".", end='', flush=True)
+    holders = client.fetch_holders()
+    assert holders == {"owner1", "owner2"}
 
-    # def fetch_traits_for_token(self, token_id):
-    #     base_url = '{base_ifps}.ipfs.dweb.link'
-    #     url = f"https://{base_url}/{token_id}"
-    #     r = {}
-    #     try:
-    #         r = requests.get(url).json()
-    #     except:
-    #         r = {"warning": "error fetching traits"}
+    sg_client.query_contract.assert_called_with(test_sg721_addr, {"owner_of": {"token_id": 3}})
 
-    #     return r
 
-    # @staticmethod
-    # def https_from_ipfs(ipfs: str) -> str:
-    #     parts = ipfs.split('/')
-    #     path = "/".join(parts[3:])
-    #     return f"https://{parts[2]}.ipfs.dweb.link/{path}"
 
-    # def fetch_traits(self):
-    #     config = self.query_minter_config()
-    #     base_url = Sg721Client.https_from_ipfs(config.base_token_uri)
+@mock.patch("stargazeutils.ipfs.get")
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_traits(sg_client, ipfs_get_mock):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+    client._minter_config = MinterConfig.from_data(test_minter_config_data)
+    client._minter_config.num_tokens = len(test_token_metadata)
 
-    #     token_attrs = []
-    #     def _get_url(url):
-    #         count = 1
-    #         while True:
-    #             r = requests.get(url)
-    #             if r.status_code == 200:
-    #                 return r.json()
-    #             LOG.warn(f"Error {count} processing url {url}: {r.status_code}")
-    #             count += 1
-    #             time.sleep(0.5)
+    ipfs_get_mock.side_effect = [MockResponse(m) for m in test_token_metadata]
+    traits = client.fetch_traits()
 
-    #     for id in range(1, config.num_tokens + 1):
-    #         url = f"{base_url}/{id}"
-    #         LOG.info(f"Fetching attributes from {url}")
-    #         metadata = _get_url(url)
-    #         traits = {}
-    #         for attr in metadata['attributes']:
-    #             if 'trait_value' in attr:
-    #                 trait = attr['trait_type']
-    #                 value = attr['trait_value']
-    #                 traits[trait] = value
-    #             elif 'value' in attr:
-    #                 trait = attr['trait_type']
-    #                 value = attr['value']
-    #                 traits[trait] = value
-    #         traits['id'] = id
-    #         traits['name'] = metadata['name']
-    #         traits['image'] = metadata['image']
-    #         token_attrs.append(traits)
+    assert len(traits) == len(test_token_traits)
+    for token in traits:
+        expected_token = test_token_traits[token['id']]
+        assert len(token) == len(expected_token)
+        for k,v in token.items():
+            assert v == expected_token[k]
 
-    #     # print(token_attrs)
-    #     return token_attrs
+@mock.patch("stargazeutils.ipfs.get")
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_fetch_traits(sg_client, ipfs_get_mock):
+    client = Sg721Client(test_sg721_addr, test_minter_addr, sg_client)
+    client._minter_config = MinterConfig.from_data(test_minter_config_data)
+    client._minter_config.num_tokens = len(test_token_metadata)
+    ipfs_get_mock.side_effect = [MockResponse(m) for m in test_token_metadata]
 
-    # def export_traits_json(self, filename):
-    #     traits = self.fetch_traits()
-    #     with open(filename, 'w') as f:
-    #         json.dump(traits, f)
-
-    # def export_traits_csv(self, filename):
-    #     traits = self.fetch_traits()
-    #     headers = list(traits[0].keys())
-    #     with open(filename, 'w') as f:
-    #         f.write('"' + '","","",'.join(headers) + '"\n')
-    #         for token in traits:
-    #             for col in headers[:-1]:
-    #                 value = "null"
-    #                 if col in token:
-    #                     value = token[col]
-    #                 f.write('"' + str(value) + '","","",')
-    #             f.write('"' + str(token[headers[-1]]) + '"\n')
-
-    # def fetch_trait_rarity(self):
-    #     tokens_info = self.fetch_traits()
-    #     traits = {}
-    #     for token in tokens_info:
-    #         for trait in token.keys():
-    #             if trait not in ['id', 'name', 'image']:
-    #                 if trait not in traits:
-    #                     traits[trait] = {token[trait]: 1}
-    #                 elif token[trait] not in traits[trait]:
-    #                     traits[trait][token[trait]] = 1
-    #                 else:
-    #                     traits[trait][token[trait]] += 1
-
-    #     return traits
-
-    # def print_trait_rarity(self):
-    #     traits = self.fetch_trait_rarity()
-    #     print('\n---')
-    #     print('Trait Rarity')
-    #     total_tokens = sum(list(traits.values())[0].values())
-    #     print(f"Total Tokens: {total_tokens}")
-    #     print('---\n')
-    #     for trait_name, trait_options in traits.items():
-    #         print(f"*** {trait_name} ***")
-    #         print(f"# Options: {len(trait_options.keys())}")
-    #         for o,v in sorted(trait_options.items(), key=lambda x: x[1]):
-    #             print(f"- {o:<25}: {v:<5} ({v / total_tokens * 100:0.2f}%)")
-    #         print("\n")
+    rarity = client.fetch_trait_rarity()
+    assert len(rarity) == len(test_rarity)
+    for trait,values in rarity.items():
+        assert len(values) == len(test_rarity[trait])
+        for value,count in values.items():
+            assert count == test_rarity[trait][value]

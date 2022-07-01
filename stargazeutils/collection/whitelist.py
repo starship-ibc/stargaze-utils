@@ -17,7 +17,7 @@ class Whitelist:
         per_address_limit: int,
         member_limit: int,
         num_members: int,
-        is_active: bool,
+        is_active: bool = True,
     ):
         self.start_time = start_time
         self.end_time = end_time
@@ -26,6 +26,18 @@ class Whitelist:
         self.member_limit = member_limit
         self.num_members = num_members
         self.is_active = is_active
+
+    def __eq__(self, o: object) -> bool:
+        if type(o) is not type(self):
+            return False
+        if len(self.__dict__) != len(o.__dict__):
+            return False
+        for k,v in self.__dict__.items():
+            if k not in o.__dict__:
+                return False
+            if v != o.__dict__[k]:
+                return False
+        return True
 
     def print(self):
         print("--- Whitelist ---")
@@ -37,7 +49,7 @@ class Whitelist:
         print(f"Member limit: {self.member_limit}")
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_data(cls, data: dict):
         end_time = timestamp_from_str(data["end_time"])
         is_active = data["is_active"]
         member_limit = data["member_limit"]

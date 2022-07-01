@@ -14,6 +14,18 @@ class RoyaltyInfo:
     def __repr__(self):
         pct = self.share * 100
         return f"<Royalty {pct:0.0f}% to {self.payment_address}>"
+    
+    def __eq__(self, o: object) -> bool:
+        if type(o) is not type(self):
+            return False
+        if len(self.__dict__) != len(o.__dict__):
+            return False
+        for k,v in self.__dict__.items():
+            if k not in o.__dict__:
+                return False
+            if v != o.__dict__[k]:
+                return False
+        return True
 
     @classmethod
     def from_data(cls, data: dict):

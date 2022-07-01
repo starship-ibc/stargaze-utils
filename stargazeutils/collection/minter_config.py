@@ -33,6 +33,18 @@ class MinterConfig:
         self.unit_price = unit_price
         self.whitelist = whitelist
 
+    def __eq__(self, o: object) -> bool:
+        if type(o) is not type(self):
+            return False
+        if len(self.__dict__) != len(o.__dict__):
+            return False
+        for k,v in self.__dict__.items():
+            if k not in o.__dict__:
+                return False
+            if v != o.__dict__[k]:
+                return False
+        return True
+
     def print(self):
         print("--- Minter Config ---")
         print(f"Admin: {self.admin}")

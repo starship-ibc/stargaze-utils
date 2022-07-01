@@ -26,6 +26,18 @@ class CollectionInfo:
         self.image_url = image_url
         self.external_link = external_link
 
+    def __eq__(self, o: object) -> bool:
+        if type(o) is not type(self):
+            return False
+        if len(self.__dict__) != len(o.__dict__):
+            return False
+        for k,v in self.__dict__.items():
+            if k not in o.__dict__:
+                return False
+            if v != o.__dict__[k]:
+                return False
+        return True
+
     def print(self):
         """Prints the collection information."""
         print("--- Collection Info ---")

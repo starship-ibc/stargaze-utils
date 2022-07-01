@@ -6,6 +6,11 @@ class Coin:
     def __repr__(self) -> str:
         return str(self)
 
+    def __eq__(self, o) -> bool:
+        return type(self) is type(o) \
+            and self.amount == o.amount \
+            and self.denom == o.denom
+
     def __str__(self) -> str:
         if self.denom == "ustars":
             star_amount = int(int(self.amount) / 1000000)

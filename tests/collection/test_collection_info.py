@@ -42,3 +42,17 @@ def test_collection_info_should_print_info(capsys):
     assert payment_addr in captured.out
     assert image_url in captured.out
     assert external_link in captured.out
+
+def test_collection_info_equality():
+    info1 = CollectionInfo('creator', 'description', RoyaltyInfo('addr', 0.02), "/images", "/link")
+    info2 = CollectionInfo('creator', 'description', RoyaltyInfo('addr', 0.02), "/images", "/link2")
+
+    assert info1 != info2
+    info2.external_link = info1.external_link
+    assert info1 != {"error": {}}
+
+    info2.tmp = "tmp"
+    assert info1 != info2
+
+    info1.key = "key"
+    assert info1 != info2
