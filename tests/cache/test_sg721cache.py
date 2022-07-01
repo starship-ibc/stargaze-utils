@@ -4,7 +4,7 @@ import shutil
 import pytest
 
 from stargazeutils.cache import SG721Cache, SG721Info
-from tests.assets import test_sg721_cache_csv_path
+from tests.assets import test_vals
 
 
 def test_sg721_info_should_return_csv_row():
@@ -47,7 +47,7 @@ def test_sg721_cache_should_create_csv_when_not_exists():
 
 
 def test_sg721_cache_should_load_csv():
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert "addr1" in cache._sg721
     assert cache._sg721["addr1"].sg721 == "addr1"
     assert cache._sg721["addr1"].name == "name1"
@@ -65,9 +65,9 @@ def test_sg721_cache_should_save_csv():
     backup_path = "./sg721-backup.csv"
     new_sg721 = "addr3"
 
-    shutil.copyfile(test_sg721_cache_csv_path, backup_path)
+    shutil.copyfile(test_vals.sg721_cach_csv_path, backup_path)
     try:
-        cache = SG721Cache(test_sg721_cache_csv_path)
+        cache = SG721Cache(test_vals.sg721_cach_csv_path)
         assert new_sg721 not in cache._sg721
         cache.update_sg721_contract_info(
             new_sg721, {"name": "name3", "symbol": "symbol3"}
@@ -75,9 +75,9 @@ def test_sg721_cache_should_save_csv():
         cache.update_sg721_minter(new_sg721, "minter3")
         cache.save_csv()
 
-        cache2 = SG721Cache(test_sg721_cache_csv_path)
+        cache2 = SG721Cache(test_vals.sg721_cach_csv_path)
     finally:
-        shutil.copyfile(backup_path, test_sg721_cache_csv_path)
+        shutil.copyfile(backup_path, test_vals.sg721_cach_csv_path)
         os.remove(backup_path)
 
     assert new_sg721 in cache2._sg721
@@ -89,71 +89,71 @@ def test_sg721_cache_should_save_csv():
 
 def test_sg721_cache_has_sg721_info_should_return_true():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, "name", "symbol")
     assert cache.has_sg721_info(addr)
 
 
 def test_sg721_cache_not_has_sg721_info_should_return_false():
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert not cache.has_sg721_info("nothere")
 
 
 def test_sg721_cache_given_only_minter_has_sg721_info_should_return_false():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, minter="minter")
     assert not cache.has_sg721_info(addr)
 
 
 def test_sg721_cache_has_minter_should_return_true():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, minter="minter")
     assert cache.has_sg721_minter(addr)
 
 
 def test_sg721_cache_not_has_minter_should_return_false():
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert not cache.has_sg721_minter("nothere")
 
 
 def test_sg721_cache_given_only_info_has_minter_should_return_false():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, "name", "symbol")
     assert not cache.has_sg721_minter(addr)
 
 
 def test_sg721_cache_has_complete_data_should_return_true():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, "name", "symbol", "minter")
     assert cache.has_complete_data(addr)
 
 
 def test_sg721_cache_given_unknown_has_complete_data_should_return_false():
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert not cache.has_complete_data("notthere")
 
 
 def test_sg721_cache_no_info_has_complete_data_should_return_false():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, minter="minter")
     assert not cache.has_complete_data(addr)
 
 
 def test_sg721_cache_no_minter_has_complete_data_should_return_false():
     addr = "test-addr"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = SG721Info(addr, "name", "symbol")
     assert not cache.has_complete_data(addr)
 
 
 def test_sg721_cache_when_cached_should_get_info():
     addr = "addr1"
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert addr in cache._sg721
     assert cache._sg721[addr].sg721 == "addr1"
     assert cache._sg721[addr].name == "name1"
@@ -162,14 +162,14 @@ def test_sg721_cache_when_cached_should_get_info():
 
 
 def test_sg721_cache_when_not_cached_should_get_none():
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     assert cache.get_sg721_info("nothere") is None
 
 
 def test_sg721_cache_should_update_info_from_data():
     addr = "addr-test"
     expected_info = SG721Info(addr, "test-name", "test-symbol", "test-minter")
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = expected_info
 
     info1 = cache.get_sg721_info(addr)
@@ -193,7 +193,7 @@ def test_sg721_cache_should_update_info_from_data():
 def test_sg721_cache_should_update_minter():
     addr = "addr-test"
     expected_info = SG721Info(addr, "test-name", "test-symbol", "test-minter")
-    cache = SG721Cache(test_sg721_cache_csv_path)
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
     cache._sg721[addr] = expected_info
 
     info1 = cache.get_sg721_info(addr)
