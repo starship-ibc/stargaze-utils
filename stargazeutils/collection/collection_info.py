@@ -31,7 +31,7 @@ class CollectionInfo:
             return False
         if len(self.__dict__) != len(o.__dict__):
             return False
-        for k,v in self.__dict__.items():
+        for k, v in self.__dict__.items():
             if k not in o.__dict__:
                 return False
             if v != o.__dict__[k]:

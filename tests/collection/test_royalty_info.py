@@ -18,6 +18,7 @@ def test_royalty_info_should_represent_object():
     assert str(royalty) in r.__repr__()
     assert addr in r.__repr__()
 
+
 def test_royalty_info_equality():
     r1 = RoyaltyInfo("addr1", "0.1")
     r2 = RoyaltyInfo("addr1", "0.1")

@@ -22,7 +22,19 @@ class MinterConfig:
         unit_price: Coin,
         whitelist: Whitelist = None,
     ):
+        """Initializes the MinterConfig object.
 
+        Arguments:
+        - admin: The admin address for the contract
+        - base_token_uri: The base token URI, usually an IPFS address
+        - num_tokens: The number of tokens in the collection
+        - per_address_limit: How many tokens an address can mint
+        - sg721_address: The colection's sg721 address
+        - sg721_code_id: The code id for the collection contract
+        - start_time: When minting is allowed to start
+        - unit_price: The public mint price
+        - whitelist: An optinoal whitelist for minting before the public release
+        """
         self.admin = admin
         self.base_token_uri = base_token_uri
         self.num_tokens = num_tokens
@@ -38,7 +50,7 @@ class MinterConfig:
             return False
         if len(self.__dict__) != len(o.__dict__):
             return False
-        for k,v in self.__dict__.items():
+        for k, v in self.__dict__.items():
             if k not in o.__dict__:
                 return False
             if v != o.__dict__[k]:
@@ -46,6 +58,7 @@ class MinterConfig:
         return True
 
     def print(self):
+        """Prints the minter config."""
         print("--- Minter Config ---")
         print(f"Admin: {self.admin}")
         print(f"Base token uri: {self.base_token_uri}")
@@ -57,6 +70,12 @@ class MinterConfig:
 
     @classmethod
     def from_data(cls, data: dict):
+        """Initializes a MinterConfig from a data dictionary as returned
+        by the starsd cosmwasm query.
+
+        Arguments:
+        - data: The data dictionary containing the minter configuration
+        """
         admin = data["admin"]
         base_token_uri = data["base_token_uri"]
         num_tokens = data["num_tokens"]

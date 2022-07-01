@@ -1,2 +1,2 @@
-from .stargaze import StargazeClient
 from .coin import Coin
+from .stargaze import StargazeClient

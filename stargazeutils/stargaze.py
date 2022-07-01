@@ -7,7 +7,7 @@ from typing import List
 
 import requests
 
-from stargazeutils.cache.sg721cache import Sg721Cache, Sg721Info
+from stargazeutils.cache.sg721cache import SG721Cache, SG721Info
 
 LOG = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class StargazeClient:
         chain_id: str = "stargaze",
         rest_url: str = "https://rest.stargaze-apis.com",
         query_method: QueryMethod = QueryMethod.BINARY,
-        sg721_cache: Sg721Cache = None,
+        sg721_cache: SG721Cache = None,
     ):
         """
         Initializes a StargazeClient
@@ -47,7 +47,7 @@ class StargazeClient:
         self.chain_id = chain_id
         self.rest_url = rest_url
         self.query_method = query_method
-        self._sg721_cache = sg721_cache or Sg721Cache()
+        self._sg721_cache = sg721_cache or SG721Cache()
 
         self._query_suffix = ["--node", self.node, "--chain-id", self.chain_id]
         self._execute_suffix = [
@@ -156,7 +156,7 @@ class StargazeClient:
             new_contracts = StargazeClient._get_json(cmd)["contracts"]
         return contracts
 
-    def fetch_sg721_contract_info(self, sg721: str) -> Sg721Info:
+    def fetch_sg721_contract_info(self, sg721: str) -> SG721Info:
         """Fetch the SG721 contract information for a given SG721
         contract address. This method caches the response so it
         only needs to query the chain at most once. Once the cache

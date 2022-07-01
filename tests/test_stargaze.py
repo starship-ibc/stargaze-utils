@@ -3,7 +3,7 @@ import shutil
 from unittest import mock
 from unittest.mock import MagicMock
 
-from stargazeutils.cache.sg721cache import Sg721Cache
+from stargazeutils.cache.sg721cache import SG721Cache
 from stargazeutils.stargaze import QueryMethod, StargazeClient
 
 cache_file = "tests/assets/sg721_cache.csv"
@@ -40,7 +40,7 @@ def mock_starsd(*args, **kwargs):
 def test_stargazeclient_can_query_contract_via_binary(mock: MagicMock):
     mock.return_value = "{}"
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     r = client.query_contract("contract", {"query": {}})
 
@@ -62,7 +62,7 @@ def test_stargazeclient_can_query_contract_via_binary(mock: MagicMock):
 
 
 def test_stargazeclient_can_query_contract_via_rest(requests_mock):
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.REST, sg721_cache=cache)
 
     contract = "testcontract"
@@ -83,7 +83,7 @@ def test_stargazeclient_should_fetch_contracts(mock: MagicMock):
         '{"contracts":[],"pagination":{"next_key":null,"total":"0"}}',
     ]
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     code_id = 1
     r = client.fetch_contracts(code_id)
@@ -114,7 +114,7 @@ def test_stargazeclient_should_fetch_paginated_contracts(mock: MagicMock):
         '{"contracts":[],"pagination":{"next_key":null,"total":"0"}}',
     ]
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     code_id = 1
     r = client.fetch_contracts(code_id)
@@ -144,7 +144,7 @@ def test_stargazeclient_should_fetch_sg721_info(mock: MagicMock):
     symbol = "NFT"
     mock.return_value = '{"data":{"name":"' + name + '","symbol":"' + symbol + '"} }'
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     info = client.fetch_sg721_contract_info(addr)
 
@@ -175,7 +175,7 @@ def test_stargazeclient_should_use_cached_sg721_info(mock: MagicMock):
     symbol = "NFT"
     mock.return_value = '{"data":{"name":"' + name + '","symbol":"' + symbol + '"} }'
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     client.fetch_sg721_contract_info(addr)
     mock.assert_called_once()
@@ -192,7 +192,7 @@ def test_stargazeclient_should_fetch_minter(mock):
     minter = "minter-addr2"
     mock.return_value = '{"data":{"minter":"' + minter + '"} }'
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     info = client.fetch_sg721_minter(addr)
 
@@ -221,7 +221,7 @@ def test_stargazeclient_should_use_cached_minter(mock):
     minter = "minter-addr"
     mock.return_value = '{"data":{"minter":"' + minter + '"} }'
 
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     client.fetch_sg721_minter(addr)
     mock.assert_called_once()
@@ -232,7 +232,7 @@ def test_stargazeclient_should_use_cached_minter(mock):
 
 
 def test_stargazeclient_should_query_txs_via_rest(requests_mock):
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.REST, sg721_cache=cache)
 
     params = {"param_name": "param_value"}
@@ -248,7 +248,7 @@ def test_stargazeclient_should_print_sg721_info(mock, capsys):
     mock.side_effect = mock_starsd
 
     shutil.copyfile(cache_file, cache_backup)
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     client.print_sg721_info(only_new=False)
     shutil.copyfile(cache_backup, cache_file)
@@ -266,7 +266,7 @@ def test_stargazeclient_should_print_only_new_sg721_info(mock, capsys):
     mock.side_effect = mock_starsd
 
     shutil.copyfile(cache_file, cache_backup)
-    cache = Sg721Cache(cache_file)
+    cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
     client.print_sg721_info(only_new=True)
     shutil.copyfile(cache_backup, cache_file)

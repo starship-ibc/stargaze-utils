@@ -1,5 +1,13 @@
 class Coin:
+    """Represents an amount and denomination"""
+
     def __init__(self, amount: str, denom: str):
+        """Initializes a new Coin.
+
+        Arguments:
+        - amount: The amount as a string
+        - denom: The coin denomination
+        """
         self.amount = amount
         self.denom = denom
 
@@ -7,9 +15,9 @@ class Coin:
         return str(self)
 
     def __eq__(self, o) -> bool:
-        return type(self) is type(o) \
-            and self.amount == o.amount \
-            and self.denom == o.denom
+        return (
+            type(self) is type(o) and self.amount == o.amount and self.denom == o.denom
+        )
 
     def __str__(self) -> str:
         if self.denom == "ustars":

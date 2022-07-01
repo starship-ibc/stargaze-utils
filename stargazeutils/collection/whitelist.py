@@ -19,6 +19,17 @@ class Whitelist:
         num_members: int,
         is_active: bool = True,
     ):
+        """Initializes a new Whitelist for a collection.
+
+        Arguments:
+        - start_time: When the whitelist minting will start
+        - end_time: When the whitelist minting will end
+        - unit_price: The whitelist price
+        - per_address_limit: How many tokens a single address can mint
+        - member_limit: The maximum number of addresses allowed
+        - num_members: The current number of allowed addresses
+        - is_active: Is the whitelist currently active
+        """
         self.start_time = start_time
         self.end_time = end_time
         self.unit_price = unit_price
@@ -32,7 +43,7 @@ class Whitelist:
             return False
         if len(self.__dict__) != len(o.__dict__):
             return False
-        for k,v in self.__dict__.items():
+        for k, v in self.__dict__.items():
             if k not in o.__dict__:
                 return False
             if v != o.__dict__[k]:
@@ -40,6 +51,7 @@ class Whitelist:
         return True
 
     def print(self):
+        """Prints the whitelist for use in a CLI app."""
         print("--- Whitelist ---")
         print(f"Num members: {self.num_members}")
         print(f"Start time: {self.start_time.strftime(DATETIME_FMT)}")
@@ -50,6 +62,12 @@ class Whitelist:
 
     @classmethod
     def from_data(cls, data: dict):
+        """Initilalizes a whitelist from a data dictionary response
+        from the stars cosmwasm query.
+
+        Arguments:
+        - data: The whitelist data dictionary
+        """
         end_time = timestamp_from_str(data["end_time"])
         is_active = data["is_active"]
         member_limit = data["member_limit"]
