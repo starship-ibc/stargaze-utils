@@ -36,6 +36,16 @@ class SG721Info:
     def __str__(self):
         return self.name or "<None>"
 
+    def __eq__(self, o: object) -> bool:
+        return (
+            type(self) is type(o)
+            and len(self.__dict__) == len(o.__dict__)
+            and self.sg721 == o.sg721
+            and self.name == o.name
+            and self.symbol == o.symbol
+            and self.minter == o.minter
+        )
+
     @classmethod
     def parse_csv_row(cls, line: str):
         """Parses a line from a CSV file into an SG721Info object. The
@@ -143,6 +153,21 @@ class SG721Cache:
         if sg721 not in self._sg721:
             return None
         return self._sg721[sg721]
+
+    def get_sg721_info_from_name(self, collection_name: str) -> SG721Info:
+        """Gets the cached SG721Info for a given collection name.
+        If the name does not exist, returns None. If there are
+        multiple collections with the same name, returns the
+        newest collection.
+
+        Arguments:
+        - collection_name: The name of the collection to search.
+        """
+        for sg721, info in reversed(self._sg721.items()):
+            if info.name == collection_name:
+                return info
+
+        return None
 
     def update_sg721_contract_info(self, sg721_addr, data: dict) -> SG721Info:
         """Updates the SG721 with the contract info (name and symbol)

@@ -7,7 +7,7 @@ from typing import List
 
 import requests
 
-from stargazeutils.cache.sg721cache import SG721Cache, SG721Info
+from stargazeutils.cache.sg721_cache import SG721Cache, SG721Info
 
 LOG = logging.getLogger(__name__)
 

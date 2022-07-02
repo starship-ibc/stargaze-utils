@@ -210,3 +210,21 @@ def test_sg721_cache_should_update_minter():
     assert info2.name == expected_info.name
     assert info2.symbol == expected_info.symbol
     assert info2.minter == expected_info.minter
+
+
+def test_sg721_cache_should_get_by_name():
+    info = SG721Info("test-name", "test-name", "test-symbol", "test-minter")
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
+    cache._sg721[info.sg721] = info
+
+    info2 = cache.get_sg721_info_from_name(info.name)
+    assert info == info2
+
+
+def test_sg721_cache_should_return_none_when_get_with_not_existing_name():
+    info = SG721Info("test-name", "test-name", "test-symbol", "test-minter")
+    cache = SG721Cache(test_vals.sg721_cach_csv_path)
+    cache._sg721[info.sg721] = info
+
+    info2 = cache.get_sg721_info_from_name("notthere")
+    assert info2 is None

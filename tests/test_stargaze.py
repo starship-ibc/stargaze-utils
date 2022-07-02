@@ -3,7 +3,7 @@ import shutil
 from unittest import mock
 from unittest.mock import MagicMock
 
-from stargazeutils.cache.sg721cache import SG721Cache
+from stargazeutils.cache.sg721_cache import SG721Cache
 from stargazeutils.stargaze import QueryMethod, StargazeClient
 
 cache_file = "tests/assets/sg721_cache.csv"
