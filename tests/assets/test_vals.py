@@ -3,6 +3,8 @@ sg721_addr = "stars17s7emulfygjuk0xn906athk5e5efsdtumsat5n2nad7mtrg4xres3ysf3p"
 minter_addr = "minter"
 whitelist_addr = "stars137gvy58wsjykawq0lqqys2een87v6e045qwu0nhr5rpqvpp9dsmqjnzaru"
 owner = "owner"
+ipfs_cid = "QmRvYPEHjsyXSg5UfqwnPoKMqcPuMHpo8ip5ReTCLh7621"
+ipfs_hash = "bafybeibvigt7h6ysdkr62zb2uq5tcwbmiapnby2t3otgbvogli5otzfg7y"
 
 minter_config_data = {
     "admin": "stars1zja6krwtcaa2ushn3z2m658k38qlg9qwg8casg",
