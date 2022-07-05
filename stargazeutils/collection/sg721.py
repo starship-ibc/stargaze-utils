@@ -1,6 +1,8 @@
-import json
 import logging
+import os
 from typing import List, Set
+
+from stargazeutils.collection.nft_collection import NFTCollection
 
 from .. import ipfs
 from ..stargaze import StargazeClient
@@ -57,6 +59,28 @@ class Sg721Client:
         self._minter_config = None
         self._whitelist_config = None
         self._collection_info = None
+
+    @classmethod
+    def from_collection_name(
+        cls, collection_name: str, sg_client: StargazeClient = None
+    ):
+        """Initializes an SG721Client from a collection name. An optional
+        StargazeClient may be provided, but if not a default one will be
+        used instead. If the collection name is not found, then return None.
+
+        The collection is retrieved from the cache within the sg_client.
+
+        Arguments:
+        - collection_name: The name of the collection
+        - sg_client: The Stargaze client.
+
+        """
+        sg_client = sg_client or StargazeClient()
+        info = sg_client.get_sg721_info(collection_name)
+        if info is None:
+            return None
+
+        return cls(info.sg721, info.minter, sg_client)
 
     def query_sg721(self, query: dict) -> dict:
         """Queries the SG721 address with a given cosmwasm query. Returns
@@ -189,7 +213,7 @@ class Sg721Client:
             holders.add(owner)
         return holders
 
-    def fetch_traits_for_token(self, token_id) -> dict:
+    def fetch_token_traits(self, token_id) -> dict:
         """Fetches the traits for a given token based on what
         it finds in IPFS metadata. This method may need to be modified
         to handle different methods that collection contracts store the
@@ -213,7 +237,7 @@ class Sg721Client:
         config = self.query_minter_config()
         url = f"{config.base_token_uri}/{token_id}"
 
-        LOG.info(f"Fetching attributes from {url}")
+        LOG.debug(f"Fetching attributes from {url}")
         metadata = ipfs.get(url).json()
         traits = {}
         for attr in metadata["attributes"]:
@@ -237,88 +261,18 @@ class Sg721Client:
 
         return traits
 
-    def fetch_traits(self) -> List[dict]:
-        """Fetches a list of traits for all minted tokens."""
-        config = self.query_minter_config()
-        tokens = range(1, config.num_tokens + 1)
-        return [self.fetch_traits_for_token(id) for id in tokens]
-
-    def export_traits_json(self, filename):
-        """Exports the list of collection traits as a JSON file.
+    def fetch_nft_collection(self, json_cache_file: str = None) -> NFTCollection:
+        """Fetches the traits for all tokens in a collection
+        and returns an NFTCollection. You can optionally provide
+        a JSON cache file (exported using NFTCollection.export_json)
+        to skip the manual fetching of traits.
 
         Arguments:
-        - filename: The path to the JSON file."""
-        traits = self.fetch_traits()
-        with open(filename, "w") as f:
-            json.dump(traits, f)
-
-    def export_traits_csv(self, filename):
-        """Exports the list of collection traits as a CSV file. This
-        file contains two blank columns in between each trait column
-        so it's easy to add stats for the traits. The CSV file is
-        comma-separated and each column is surrounded by double-quotes.
-
-        Arguments:
-        - filename: The path to the CSV file."""
-        traits = self.fetch_traits()
-        headers = list(traits[0].keys())
-        with open(filename, "w") as f:
-            f.write('"' + '","","",'.join(headers) + '"\n')
-            for token in traits:
-                for col in headers[:-1]:
-                    value = "null"
-                    if col in token:
-                        value = token[col]
-                    f.write('"' + str(value) + '","","",')
-                f.write('"' + str(token[headers[-1]]) + '"\n')
-
-    def fetch_trait_rarity(self) -> dict:
-        """Fetches a dictinoary of trait rarity information. Returns
-        the data in this format:
-
-        ```json
-        {
-            "trait_name": {"trait_value": [<token_id>, ...], ...},
-            ...
-        }
-        ```
-        """
-        tokens_info = self.fetch_traits()
-        traits = {}
-        for token in tokens_info:
-            for trait in token.keys():
-                if trait not in [
-                    "id",
-                    "name",
-                    "image",
-                    "edition",
-                    "description",
-                    "dna",
-                ]:
-                    if trait not in traits:
-                        traits[trait] = {token[trait]: 1}
-                    elif token[trait] not in traits[trait]:
-                        traits[trait][token[trait]] = 1
-                    else:
-                        traits[trait][token[trait]] += 1
-
-        return traits
-
-    def print_trait_rarity(self):
-        """Prints the trait rarity information including the following:
-        - Total tokens
-        - Each trait type
-        - Each trait value, count of tokens, and percentage of total tokens
-        """
-        traits = self.fetch_trait_rarity()
-        print("\n---")
-        print("Trait Rarity")
-        total_tokens = sum(list(traits.values())[0].values())
-        print(f"Total Tokens: {total_tokens}")
-        print("---\n")
-        for trait_name, trait_options in traits.items():
-            print(f"*** {trait_name} ***")
-            print(f"# Options: {len(trait_options.keys())}")
-            for o, v in sorted(trait_options.items(), key=lambda x: x[1]):
-                print(f"- {o:<25}: {v:<5} ({v / total_tokens * 100:0.2f}%)")
-            print("\n")
+        - json_cache_file: An optional file containing the JSON cache."""
+        if json_cache_file is None or not os.path.exists(json_cache_file):
+            config = self.query_minter_config()
+            token_ids = range(1, config.num_tokens + 1)
+            LOG.info(f"Fetching {len(token_ids)} token traits. This may take a while.")
+            tokens = [self.fetch_token_traits(id) for id in token_ids]
+            return NFTCollection(self.sg721, tokens)
+        return NFTCollection.from_json_file(self.sg721, json_cache_file)

@@ -1,5 +1,6 @@
 from unittest import mock
 
+from stargazeutils.cache.sg721_info import SG721Info
 from stargazeutils.collection import Sg721Client
 from stargazeutils.collection.collection_info import CollectionInfo
 from stargazeutils.collection.minter_config import MinterConfig
@@ -179,33 +180,49 @@ def test_sg721_client_should_fetch_holders(sg_client):
 
 @mock.patch("stargazeutils.ipfs.get")
 @mock.patch("stargazeutils.StargazeClient")
-def test_sg721_client_should_fetch_traits(sg_client, ipfs_get_mock):
+def test_sg721_client_should_fetch_nft_collection(sg_client, ipfs_get_mock):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
     client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
     client._minter_config.num_tokens = len(test_vals.token_metadata)
 
     ipfs_get_mock.side_effect = [MockResponse(m) for m in test_vals.token_metadata]
-    traits = client.fetch_traits()
+    collection = client.fetch_nft_collection()
 
-    assert len(traits) == len(test_vals.token_traits)
-    for token in traits:
-        expected_token = test_vals.token_traits[token["id"]]
+    assert len(collection.tokens) == len(test_vals.token_traits)
+    for id, token in collection.tokens.items():
+        expected_token = test_vals.token_traits[id]
         assert len(token) == len(expected_token)
         for k, v in token.items():
             assert v == expected_token[k]
 
 
-@mock.patch("stargazeutils.ipfs.get")
 @mock.patch("stargazeutils.StargazeClient")
-def test_sg721_client_should_fetch_trait_rarity(sg_client, ipfs_get_mock):
+def test_sg721_client_should_fetch_nft_collection_from_json(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
     client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
     client._minter_config.num_tokens = len(test_vals.token_metadata)
-    ipfs_get_mock.side_effect = [MockResponse(m) for m in test_vals.token_metadata]
 
-    rarity = client.fetch_trait_rarity()
-    assert len(rarity) == len(test_vals.rarity)
-    for trait, values in rarity.items():
-        assert len(values) == len(test_vals.rarity[trait])
-        for value, count in values.items():
-            assert count == test_vals.rarity[trait][value]
+    c = client.fetch_nft_collection(test_vals.test_collection_file)
+    assert c.sg721 == test_vals.sg721_addr
+    assert c.tokens[1] == {"id": 1, "Color": "blue", "Type": "electric"}
+    assert c.tokens[2] == {"id": 2, "Color": "blue", "Type": "water"}
+    assert c.tokens[3] == {"id": 3, "Color": "red", "Type": "fire"}
+    assert c.tokens[4] == {"id": 4, "Color": "yellow", "Type": "electric"}
+
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_create_from_collection_name(sg_client):
+    sg_client.get_sg721_info.return_value = SG721Info(
+        test_vals.sg721_addr, test_vals.collection_name
+    )
+    client = Sg721Client.from_collection_name(test_vals.collection_name, sg_client)
+
+    assert client.sg721 == test_vals.sg721_addr
+
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_sg721_client_should_return_none_when_collection_name_not_found(sg_client):
+    sg_client.get_sg721_info.return_value = None
+    client = Sg721Client.from_collection_name(test_vals.collection_name, sg_client)
+
+    assert client is None
