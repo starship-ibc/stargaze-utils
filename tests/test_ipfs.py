@@ -1,3 +1,5 @@
+from requests_mock import ANY as ANY_url
+
 from stargazeutils import ipfs
 from tests.assets import test_vals
 
@@ -6,7 +8,7 @@ def test_ipfs_should_get_response(requests_mock):
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     expected_json = {"data": {"result": "success"}}
     requests_mock.get(
-        f"https://{test_vals.ipfs_hash}.ipfs.dweb.link/path",
+        ANY_url,
         json=expected_json,
     )
 
@@ -18,7 +20,7 @@ def test_ipfs_should_retry(requests_mock):
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     expected_json = {"data": {"result": "success"}}
     requests_mock.get(
-        f"https://{test_vals.ipfs_hash}.ipfs.dweb.link/path",
+        ANY_url,
         [
             {"status_code": 500},
             {"status_code": 500},
@@ -33,7 +35,7 @@ def test_ipfs_should_retry(requests_mock):
 def test_ipfs_should_return_last_error(requests_mock):
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     requests_mock.get(
-        f"https://{test_vals.ipfs_hash}.ipfs.dweb.link/path",
+        ANY_url,
         [{"status_code": 500}],
     )
 

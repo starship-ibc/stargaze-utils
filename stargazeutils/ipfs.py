@@ -29,7 +29,7 @@ def ipfs_to_http(ipfs_url: str) -> str:
         f"https://{root_hash}.ipfs.dweb.link/{path}",
         f"https://cloudflare-ipfs.com/ipfs/{root_hash}/{path}",
     ]
-    return urls[1]
+    return urls[0]
 
 
 def get(
