@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from stargazeutils.cache.sg721_cache import SG721Cache
+from stargazeutils.cache.sg721_info import SG721Info
 from stargazeutils.stargaze import QueryMethod, StargazeClient
 
 cache_file = "tests/assets/sg721_cache.csv"
@@ -277,3 +278,13 @@ def test_stargazeclient_should_print_only_new_sg721_info(mock, capsys):
     assert "name2" not in captured.out
     assert "Collection 3" in captured.out
     assert "Collection 4" in captured.out
+
+
+@mock.patch("stargazeutils.cache.sg721_cache.SG721Cache")
+def test_stargaze_client_should_get_sg721_info_from_collection_name(mock_cache):
+    client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=mock_cache)
+    expected_info = SG721Info("sg721", "name", "sym", "mint")
+    mock_cache.get_sg721_info_from_name.return_value = expected_info
+    info = client.get_sg721_info(expected_info.name)
+
+    assert info == expected_info

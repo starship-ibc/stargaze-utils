@@ -109,6 +109,9 @@ class StargazeClient:
 
         return self._query_rest_contract(contract, query)
 
+    def get_sg721_info(self, collection_name) -> SG721Info:
+        return self._sg721_cache.get_sg721_info_from_name(collection_name)
+
     def query_txs(self, params: dict):
         """Queries the transactions on the blockchain based on the
         given parameters. This only queries the transactions via
