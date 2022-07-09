@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+
+from stargazeutils.common import EPOCH
+
 collection_name = "Test Collection"
 sg721_cach_csv_path = "tests/assets/sg721_cache.csv"
 sg721_addr = "stars17s7emulfygjuk0xn906athk5e5efsdtumsat5n2nad7mtrg4xres3ysf3p"
@@ -6,7 +10,15 @@ whitelist_addr = "stars137gvy58wsjykawq0lqqys2een87v6e045qwu0nhr5rpqvpp9dsmqjnza
 owner = "owner"
 ipfs_cid = "QmRvYPEHjsyXSg5UfqwnPoKMqcPuMHpo8ip5ReTCLh7621"
 ipfs_hash = "bafybeibvigt7h6ysdkr62zb2uq5tcwbmiapnby2t3otgbvogli5otzfg7y"
-test_collection_file = "tests/assets/eg_collection.json"
+collection_file = "tests/assets/eg_collection.json"
+
+
+def str_from_timestamp(ts):
+    return str(int((ts - EPOCH).total_seconds() * 1000)) + "000000"
+
+
+future_timestamp_str = str_from_timestamp(datetime.utcnow() + timedelta(3))
+
 
 minter_config_data = {
     "admin": "stars1zja6krwtcaa2ushn3z2m658k38qlg9qwg8casg",
@@ -137,4 +149,45 @@ rarity = {
     "Hair": {"pinkmidsideslick_hair": 1, "pinkmediumwavy_hair": 1},
     "Front": {"yellowblack_headphones": 1, "redbugeye_glasses": 1},
     "Bubble": {"empty": 2},
+}
+
+market_ask = {
+    "sale_type": "fixed_price",
+    "collection": sg721_addr,
+    "token_id": 1,
+    "seller": "seller-1",
+    "price": "15000000000",
+    "expires_at": future_timestamp_str,
+    "funds_recipient": "seller-1",
+    "reserve_for": None,
+    "is_active": True,
+    "finders_fee_bps": None,
+}
+
+sale_token_id = 42
+sale_seller = "seller-1"
+sale_buyer = "buyer-2"
+sale_timestamp = datetime(2022, 5, 16, 22, 3, 48)
+sale_height = 2901543
+sale_price = "14000000000"
+sale_tx_hash = "12345"
+sale_tx = {
+    "timestamp": sale_timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "height": sale_height,
+    "txhash": sale_tx_hash,
+    "logs": [
+        {
+            "events": [
+                {
+                    "type": "wasm-finalize-sale",
+                    "attributes": [
+                        {"key": "token_id", "value": sale_token_id},
+                        {"key": "price", "value": sale_price},
+                        {"key": "seller", "value": sale_seller},
+                        {"key": "buyer", "value": sale_buyer},
+                    ],
+                }
+            ]
+        }
+    ],
 }

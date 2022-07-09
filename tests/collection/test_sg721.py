@@ -202,7 +202,7 @@ def test_sg721_client_should_fetch_nft_collection_from_json(sg_client):
     client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
     client._minter_config.num_tokens = len(test_vals.token_metadata)
 
-    c = client.fetch_nft_collection(test_vals.test_collection_file)
+    c = client.fetch_nft_collection(test_vals.collection_file)
     assert c.sg721 == test_vals.sg721_addr
     assert c.tokens[1] == {"id": 1, "Color": "blue", "Type": "electric"}
     assert c.tokens[2] == {"id": 2, "Color": "blue", "Type": "water"}
