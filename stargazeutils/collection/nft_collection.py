@@ -1,6 +1,8 @@
 import json
 from typing import List, Set
 
+from stargazeutils.common import print_table
+
 
 class NFTCollection:
     """Represents an NFT Collection and the token metadata."""
@@ -48,7 +50,7 @@ class NFTCollection:
                         self.traits[trait][value] = []
                     self.traits[trait][value].append(id)
 
-    def filter_tokens(self, filters: dict) -> Set:
+    def filter_tokens(self, filters: dict) -> Set[str]:
         """Filter the token set based on a set of filters. The filters
         argument is a {trait_name:[values]} where each key is the trait key
         and the list is a list of acceptable trait values. If there is more
@@ -128,21 +130,28 @@ class NFTCollection:
 
         return traits
 
+    def get_trait_rarity_table(self) -> List[List]:
+        """Gets a list of trait rarity info that can be printed
+        using print_table.
+        """
+        traits = self.fetch_trait_rarity()
+        total_tokens = sum(list(traits.values())[0].values())
+        table = []
+        table.append(["Total Tokens", total_tokens, ""])
+
+        for trait_name, trait_options in traits.items():
+            table.append(["", "", ""])
+            table.append([f"{len(trait_options.keys())} {trait_name}", "", ""])
+            for o, v in sorted(trait_options.items(), key=lambda x: x[1]):
+                table.append([f"- {o}", v, f"{v/total_tokens * 100:0.2f}%"])
+
+        return table
+
     def print_trait_rarity(self):
         """Prints the trait rarity information including the following:
         - Total tokens
         - Each trait type
         - Each trait value, count of tokens, and percentage of total tokens
         """
-        traits = self.fetch_trait_rarity()
-        print("---")
-        print("Trait Rarity")
-        total_tokens = sum(list(traits.values())[0].values())
-        print(f"Total Tokens: {total_tokens}")
-        print("---\n")
-        for trait_name, trait_options in traits.items():
-            print(f"*** {trait_name} ***")
-            print(f"# Options: {len(trait_options.keys())}")
-            for o, v in sorted(trait_options.items(), key=lambda x: x[1]):
-                print(f"- {o:<25}: {v:<5} ({v / total_tokens * 100:0.2f}%)")
-            print("\n")
+        table = self.get_trait_rarity_table()
+        print_table(table, header="Trait Rarity", delimiter="")
