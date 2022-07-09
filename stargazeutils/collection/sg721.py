@@ -189,10 +189,10 @@ class Sg721Client:
         """
         return self.query_sg721({"contract_info": {}})
 
-    def query_nft_info(self, token_id: str) -> dict:
-        """Queries for "all nft info" of a given token id. Returns
-        the data dictionary response from stars cosmwasm."""
-        return self.query_sg721({"all_nft_info": {"token_id": token_id}})
+    # def query_nft_info(self, token_id: str) -> dict:
+    #     """Queries for "all nft info" of a given token id. Returns
+    #     the data dictionary response from stars cosmwasm."""
+    #     return self.query_sg721({"all_nft_info": {"token_id": token_id}})
 
     # def create_mintable_list(self, count=None):
     #     if count is None:
