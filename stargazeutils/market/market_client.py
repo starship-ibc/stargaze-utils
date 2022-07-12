@@ -168,6 +168,5 @@ class MarketClient:
         txs = []
         for page in pages:
             if "txs" in page:
-                more_txs = page["txs"]
                 txs.extend([MarketSale.from_tx(tx) for tx in page["txs"]])
         return txs
