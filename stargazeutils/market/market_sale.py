@@ -68,7 +68,7 @@ class MarketSale:
         return f"<token_id={self.token_id} price={self.price}>"
 
     def __str__(self):
-        return f"Spunk #{self.token_id:4} @ {self.price:6} $STARS [{self.tx_hash}]"
+        return f"Spunk #{self.token_id:4} @ {self.price} [{self.tx_hash}]"
 
     @classmethod
     def from_tx(cls, tx: dict):

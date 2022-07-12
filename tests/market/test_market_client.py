@@ -1,9 +1,11 @@
+from datetime import datetime
 from unittest import mock
 
+from stargazeutils.coin import Coin
 from stargazeutils.common import MARKET_CONTRACT
 from stargazeutils.market import MarketClient
 from stargazeutils.market.market_ask import MarketAsk
-from tests.assets import test_vals
+from tests.assets import test_sales, test_vals
 
 
 @mock.patch("stargazeutils.StargazeClient")
@@ -93,3 +95,26 @@ def test_market_client_should_fetch_filtered_asks(sg_client, mock_nft_collection
 
     expected_ask = MarketAsk.from_dict(test_vals.market_ask)
     assert asks.asks[0] == expected_ask
+
+
+@mock.patch("stargazeutils.StargazeClient")
+def test_market_client_should_fetch_sales(sg_client, requests_mock):
+    sg_client.rest_url = "https://stargaze"
+    client = MarketClient(MARKET_CONTRACT, sg_client)
+
+    requests_mock.get(sg_client.rest_url + "/txs", json=test_sales.sales)
+
+    sales = client.fetch_collection_sales(test_vals.sg721_addr)
+    assert len(sales) == 1
+
+    expected_sale = test_sales.sales["txs"][0]
+    sale = sales[0]
+    assert sale.token_id == "6681"
+    assert sale.price == Coin.from_stars(1300)
+    assert sale.tx_hash == expected_sale["txhash"]
+    assert sale.seller == "seller-1"
+    assert sale.buyer == "buyer-1"
+    assert sale.timestamp == datetime.strptime(
+        expected_sale["timestamp"], "%Y-%m-%dT%H:%M:%SZ"
+    )
+    assert sale.height == expected_sale["height"]

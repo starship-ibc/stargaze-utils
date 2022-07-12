@@ -7,6 +7,7 @@ from ..collection import NFTCollection
 from ..stargaze import StargazeClient
 from .market_ask import MarketAsk
 from .market_sale import MarketSale
+from .unstable_helper import fetch_unstable_paged_data
 
 LOG = logging.getLogger(__name__)
 
@@ -157,24 +158,16 @@ class MarketClient:
         :param sg721: The collection SG721 address
         :return A list of MarketSales
         """
-        limit = 30
-        params = {"wasm-finalize-sale.collection": sg721, "limit": limit}
-        r = self.sg_client.query_txs(params)
-        total_count = int(r["total_count"])
-
-        pages = int(r["page_total"])
-        txs = [MarketSale.from_tx(tx) for tx in r["txs"]]
-        LOG.info(f"Found {pages} pages of {total_count} sales")
-        print(f"first {len(txs)}")
-        for page in range(2, pages + 1):
-            params = params = {
-                "wasm-finalize-sale.collection": sg721,
-                "limit": str(limit),
-                "page": page,
-            }
-            r = self.sg_client.query_txs(params)
-            if "txs" in r:
-                more_txs = r["txs"]
-                print(f"more {len(more_txs)}")
-                txs.extend([MarketSale.from_tx(tx) for tx in r["txs"]])
+        url = self.sg_client.rest_url + "/txs"
+        finalize_sale_params = {
+            "wasm-finalize-sale.collection": sg721,
+            "limit": 100,
+            "page": 1,
+        }
+        pages = fetch_unstable_paged_data(url, finalize_sale_params)
+        txs = []
+        for page in pages:
+            if "txs" in page:
+                more_txs = page["txs"]
+                txs.extend([MarketSale.from_tx(tx) for tx in page["txs"]])
         return txs
