@@ -53,8 +53,10 @@ cache_dir = os.path.join(os.curdir, "cache", "collections")
 json_file = collection_name.lower().replace(" ", "-") + ".json"
 json_trait_cache_file = os.path.join(cache_dir, json_file)
 
+print("")
 traits = client.fetch_nft_collection(json_trait_cache_file)
 traits.export_json(json_trait_cache_file)
+print(f"Trait cache file stored at {json_trait_cache_file}")
 
 print("")
 traits.print_trait_rarity()
