@@ -25,6 +25,10 @@ from stargazeutils.collection.sg721 import Sg721Client
 # so the system respects the configuration.
 logging.basicConfig(level=logging.INFO)
 
+# Setting this to DEBUG so we get a printout
+# of fetching the token traits if needed.
+logging.getLogger("stargazeutils.collection.sg721").setLevel(level=logging.DEBUG)
+
 from stargazeutils.stargaze import QueryMethod, StargazeClient  # noqa: E402
 
 requests_cache.install_cache("stargaze-ipfs")
