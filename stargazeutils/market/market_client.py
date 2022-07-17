@@ -96,7 +96,7 @@ class MarketClient:
             for ask_data in asks:
                 ask = MarketAsk.from_dict(ask_data)
 
-                if strict_verify:
+                if ask.is_valid() and strict_verify:
                     owner = self.sg_client.query_contract(
                         ask.collection, {"owner_of": {"token_id": str(ask.token_id)}}
                     )["data"]
