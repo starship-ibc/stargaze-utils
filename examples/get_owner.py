@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-#
-# This scripts gets the current owner for a given
-# collection and token id.
 
-import sys
+import argparse
 
 from stargazeutils.collection import Sg721Client
 
-if len(sys.argv) < 3:
-    print("Need to specify a collection name and token id")
-    exit(1)
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="Gets the current owner for a given collection and token id.",
+)
+parser.add_argument(
+    "collection_name", type=str, help="The name of the Stargaze collection"
+)
+parser.add_argument("token_id", type=int, help="The token id to query.")
+args = parser.parse_args()
 
-collection_name = sys.argv[1]
-token_id = sys.argv[2]
+client = Sg721Client.from_collection_name(args.collection_name)
+owner = client.query_owner_of_token(args.token_id)
 
-client = Sg721Client.from_collection_name(collection_name)
-owner = client.query_owner_of_token(token_id)
-
-print(f"Owner of {collection_name} {token_id} is {owner}")
+print(f"Owner of {args.collection_name} {args.token_id} is {owner}")

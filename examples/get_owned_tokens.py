@@ -7,6 +7,7 @@ from stargazeutils.collection import Sg721Client
 from stargazeutils.common import print_table
 
 parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
     description="""
 Fetches info on the currently owned tokens in a collection for a
 given address and prints out the results as a table with token
@@ -21,7 +22,7 @@ poetry run python examples/get_owned_tokens.py \
     stars1zja6krwtcaa2ushn3z2m658k38qlg9qwg8casg \
     --excluded_traits image name Glow Eyes Hair Mouth Bubble \
     --sort hubble_rank
-"""
+""",
 )
 parser.add_argument(
     "collection_name", type=str, help="The name of the collection to query"
