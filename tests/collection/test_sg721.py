@@ -14,12 +14,12 @@ from ..assets import test_vals
 def test_sg721_client_should_fetch_tokens_owned_by(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
-    sg_client.query_contract.return_value = {"data": {"tokens": [1, 2, 3]}}
+    sg_client.query_contract.side_effect = [
+        {"data": {"tokens": [1, 2, 3]}},
+        {"data": {"tokens": []}}
+    ]
     tokens = client.query_tokens_owned_by(test_vals.owner)
 
-    sg_client.query_contract.assert_called_with(
-        test_vals.sg721_addr, {"tokens": {"owner": test_vals.owner}}
-    )
     assert tokens == [1, 2, 3]
 
 

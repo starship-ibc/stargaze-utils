@@ -107,7 +107,19 @@ class Sg721Client:
         Arguments:
         - owner: The owner's stars address.
         """
-        return self.query_sg721({"tokens": {"owner": owner}})["tokens"]
+        start_after = 0
+        limit = 30
+        tokens = []
+        query = {
+            "tokens": {"owner": owner, "start_after": str(start_after), "limit": limit}
+        }
+        c_tokens = self.query_sg721(query)["tokens"]
+        while len(c_tokens) > 0:
+            tokens.extend(c_tokens)
+            query["tokens"]["start_after"] = c_tokens[-1]
+            c_tokens = self.query_sg721(query)["tokens"]
+
+        return [int(t) for t in tokens]
 
     def query_minter_config(self) -> MinterConfig:
         """Queries for the minter configuration if not cached. The response
@@ -207,8 +219,7 @@ class Sg721Client:
         tokens = self.fetch_minted_tokens()
         holders = set()
         for token in tokens:
-            if len(tokens) > 1000 and int(token) % 10 == 0:
-                LOG.debug(f"Fetching owner for token {token}")
+            LOG.debug(f"Fetching owner for token {token}")
             owner = self.query_sg721({"owner_of": {"token_id": token}})["owner"]
             holders.add(owner)
         return holders
@@ -275,4 +286,5 @@ class Sg721Client:
             LOG.info(f"Fetching {len(token_ids)} token traits. This may take a while.")
             tokens = [self.fetch_token_traits(id) for id in token_ids]
             return NFTCollection(self.sg721, tokens)
+        LOG.info(f"Loading token traits from JSON cache file '{json_cache_file}'")
         return NFTCollection.from_json_file(self.sg721, json_cache_file)
