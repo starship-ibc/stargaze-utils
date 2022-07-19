@@ -1,7 +1,10 @@
 import json
+import logging
 from typing import List, Set
 
-from stargazeutils.common import print_table
+from stargazeutils.common import export_table_csv, print_table
+
+LOG = logging.getLogger(__name__)
 
 
 class NFTCollection:
@@ -80,6 +83,38 @@ class NFTCollection:
         with open(filename, "w") as f:
             json.dump(list(self.tokens.values()), f)
 
+    def get_tokens_info_table(
+        self,
+        token_ids: List[int] = None,
+        excluded_traits: List[str] = [],
+        sort_key: str = None,
+    ) -> List[List]:
+        token_ids = token_ids or self.tokens.keys()
+        headers = ["id"]
+        excluded_traits.append("id")
+        for header in self.tokens[1].keys():
+            if header not in excluded_traits:
+                headers.append(header)
+
+        table = []
+        for id in token_ids:
+            row = []
+            for col in headers:
+                value = "null"
+                if col in self.tokens[id]:
+                    value = self.tokens[id][col]
+                row.append(value)
+            table.append(row)
+
+        if sort_key is not None:
+            if sort_key not in headers:
+                LOG.warning(f"Sort key {sort_key} not found, skipping sorting")
+            else:
+                index = headers.index(sort_key)
+                table.sort(key=lambda x: x[index])
+        table.insert(0, headers)
+        return table
+
     def export_csv(self, filename):
         """Exports the list of collection traits as a CSV file. This
         file contains two blank columns in between each trait column
@@ -88,16 +123,8 @@ class NFTCollection:
 
         Arguments:
         - filename: The path to the CSV file."""
-        headers = list(self.tokens[1].keys())
-        with open(filename, "w") as f:
-            f.write('"' + '","","",'.join(headers) + '"\n')
-            for token in self.tokens.values():
-                for col in headers[:-1]:
-                    value = "null"
-                    if col in token:
-                        value = token[col]
-                    f.write('"' + str(value) + '","","",')
-                f.write('"' + str(token[headers[-1]]) + '"\n')
+        tokens_table = self.get_tokens_info_table()
+        export_table_csv(tokens_table, filename)
 
     def fetch_trait_rarity(self) -> dict:
         """Fetches a dictinoary of trait rarity information. Returns

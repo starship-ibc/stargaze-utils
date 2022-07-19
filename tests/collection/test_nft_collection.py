@@ -1,6 +1,7 @@
 import os
 
 from stargazeutils.collection import NFTCollection
+from stargazeutils.common import print_table
 
 from ..assets import test_vals
 
@@ -72,17 +73,58 @@ def test_nft_collection_should_export_json():
     finally:
         os.remove(filename)
 
-
-def test_nft_collection_should_export_csv():
+def test_nft_collection_should_get_token_table():
     c = NFTCollection.from_json_file(test_vals.sg721_addr, test_vals.collection_file)
-    filename = "test-collection.csv"
-    assert not os.path.exists(filename)
-    try:
-        c.export_csv(filename)
-        assert os.path.exists(filename)
-    finally:
-        os.remove(filename)
+    table = c.get_tokens_info_table()
+    assert table == [
+        ["id",  "Color",     "Type" ],
+        [   1,   "blue", "electric" ],
+        [   2,   "blue",    "water" ],
+        [   3,    "red",     "fire" ],
+        [   4, "yellow", "electric" ],
+    ]
 
+def test_nft_collection_should_get_token_table_should_ignore_invalid_sort_key():
+    c = NFTCollection.from_json_file(test_vals.sg721_addr, test_vals.collection_file)
+    table = c.get_tokens_info_table(sort_key="baddata")
+    assert table == [
+        ["id",  "Color",     "Type" ],
+        [   1,   "blue", "electric" ],
+        [   2,   "blue",    "water" ],
+        [   3,    "red",     "fire" ],
+        [   4, "yellow", "electric" ],
+    ]
+
+def test_nft_collection_should_get_token_table_excluding_traits():
+    c = NFTCollection.from_json_file(test_vals.sg721_addr, test_vals.collection_file)
+    table = c.get_tokens_info_table(excluded_traits=["Type"])
+    assert table == [
+        ["id",  "Color" ],
+        [   1,   "blue" ],
+        [   2,   "blue" ],
+        [   3,    "red" ],
+        [   4, "yellow" ],
+    ]
+
+def test_nft_collection_should_get_token_table_given_specific_tokens():
+    c = NFTCollection.from_json_file(test_vals.sg721_addr, test_vals.collection_file)
+    table = c.get_tokens_info_table(token_ids=[1,2], excluded_traits=["Type"])
+    assert table == [
+        ["id",  "Color" ],
+        [   1,   "blue" ],
+        [   2,   "blue" ],
+    ]
+
+def test_nft_collection_should_get_sorted_token_table():
+    c = NFTCollection.from_json_file(test_vals.sg721_addr, test_vals.collection_file)
+    table = c.get_tokens_info_table(sort_key="Type")
+    assert table == [
+        ["id",  "Color",     "Type" ],
+        [   1,   "blue", "electric" ],
+        [   4, "yellow", "electric" ],
+        [   3,    "red",     "fire" ],
+        [   2,   "blue",    "water" ],
+    ]
 
 def test_nft_collection_should_get_rarity_tables():
     collection = NFTCollection.from_json_file(
