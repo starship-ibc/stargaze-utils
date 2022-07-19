@@ -16,7 +16,7 @@ def test_sg721_client_should_fetch_tokens_owned_by(sg_client):
 
     sg_client.query_contract.side_effect = [
         {"data": {"tokens": [1, 2, 3]}},
-        {"data": {"tokens": []}}
+        {"data": {"tokens": []}},
     ]
     tokens = client.query_tokens_owned_by(test_vals.owner)
 

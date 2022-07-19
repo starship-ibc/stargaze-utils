@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description="""
 Fetch the current floor pricing for each trait in a given Stargaze collection.
-    
+
 Examples:
 
 To print out the floor pricing for current punk asks by Trait:
@@ -27,12 +27,15 @@ To print out the floor pricing without adding extra validation
 To output the current asks by trait:
 
     python3 get_floor_pricing.py "Stargaze Punks" --output csv
-    """
+    """,
 )
 
 parser.add_argument("collection", type=str, help="The name of the Stargaze Collection.")
 parser.add_argument(
-    "--output", type=str, default="print", help="Use csv to save the output as a csv file"
+    "--output",
+    type=str,
+    default="print",
+    help="Use csv to save the output as a csv file",
 )
 parser.add_argument(
     "--strict",
