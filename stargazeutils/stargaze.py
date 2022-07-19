@@ -84,7 +84,7 @@ class StargazeClient:
             f"{self.rest_url}/cosmwasm/wasm/v1/"
             + f"contract/{contract}/smart/{encoded_query}"
         )
-        print(f"url = {url}")
+        LOG.debug(f"url = {url}")
         return requests.get(url).json()
 
     def query_contract(self, contract: str, query: dict) -> dict:

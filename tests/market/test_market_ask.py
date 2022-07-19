@@ -11,6 +11,25 @@ def test_sale_type_from_string():
     assert SaleType.from_str("fixed_price") == SaleType.FIXED_PRICE
     assert SaleType.from_str("any") == SaleType.UNSUPPORTED
 
+def test_market_ask_equality():
+    ask1 = MarketAsk.from_dict(test_vals.market_ask)
+    ask2 = MarketAsk.from_dict(test_vals.market_ask)
+    
+    assert ask1 == ask2
+    assert ask1 != 1
+
+    ask2.collection = "new-collection"
+    assert ask1 != ask2
+    
+    ask2.collection = ask1.collection
+    assert ask1 == ask2
+    
+    ask2.foo = "test"
+    assert ask1 != ask2
+
+    ask2.__dict__.pop("collection")
+    assert ask1 != ask2
+
 
 def test_market_ask_is_valid_when_not_strict():
     ask = MarketAsk.from_dict(test_vals.market_ask)
