@@ -120,6 +120,7 @@ class NFTCollection:
                     "edition",
                     "description",
                     "dna",
+                    "hubble_rank",
                 ]:
                     if trait not in traits:
                         traits[trait] = {token[trait]: 1}
