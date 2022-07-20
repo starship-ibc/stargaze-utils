@@ -6,6 +6,7 @@ This python package provides a set of utilities for interacting with the [Starga
 - [Installation](#installation)
 - [Examples](#examples)
 - [Caching](#caching)
+- [Donations](#donations)
 
 ## Prerequisites
 
@@ -43,3 +44,11 @@ requests_cache.install_cache("stargaze-ipfs")
 ```
 
 The requests_cache package uses a sqlite database under the hood to store responses for any requests being made. See the [docs](https://requests-cache.readthedocs.io/en/stable/) for more information.
+
+## Donations
+
+If you'd like to make a donation, you may send $STARS to the following address. If you're like to sponsor a specific issue, feel free to include it in the memo line so I know what's most important to the community.
+
+```
+stars1z6mj02l2s8v0vsxfsark5v7t076ds8pu9nj2fv
+```
