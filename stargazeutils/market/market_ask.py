@@ -88,6 +88,12 @@ class MarketAsk:
 
         return True
 
+    @property
+    def get_marketplace_url(self):
+        return (
+            f"https://app.stargaze.zone/marketplace/{self.collection}/{self.token_id}"
+        )
+
     def __repr__(self):
         return (
             f"<MarketAsk for {self.collection} token {self.token_id} of {self.price}>"

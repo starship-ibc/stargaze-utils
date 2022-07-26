@@ -174,7 +174,7 @@ class StargazeClient:
         data = self.query_contract(sg721, {"contract_info": {}})["data"]
         return self._sg721_cache.update_sg721_contract_info(sg721, data)
 
-    def fetch_sg721_minter(self, sg721: str) -> str:
+    def fetch_sg721_minter(self, sg721: str) -> SG721Info:
         """Fetch the SG721 contract minter's address for a given SG721
         contract address. This method caches the response so it
         only needs to query the chain at most once. Once the cache
