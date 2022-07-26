@@ -183,7 +183,7 @@ class Sg721Client:
                 {"all_tokens": {"start_after": start_after, "limit": limit}}
             )["tokens"]
         minted_tokens += tokens
-        return minted_tokens
+        return [int(t) for t in minted_tokens]
 
     def query_owner_of_token(self, token_id) -> str:
         """Queries for the owner of a given token id. Returns the owner
