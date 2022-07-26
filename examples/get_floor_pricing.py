@@ -48,12 +48,10 @@ parser.add_argument(
 
 def get_floor_pricing_table(
     collection_name: str,
-    selected_traits: List[str],
     strict_validation: bool = True,
     num_prices: int = 3,
 ) -> dict:
     print(f"Collection name: {collection_name}")
-    print(f"Selected traits: {selected_traits}")
     print(f"Strict: {strict_validation}")
 
     market = MarketClient(MARKET_CONTRACT)
@@ -99,9 +97,8 @@ def get_floor_pricing_table(
 
 args = parser.parse_args()
 collection_name = args.collection
-selected_traits = args.traits
 
-table = get_floor_pricing_table(collection_name, selected_traits, args.strict)
+table = get_floor_pricing_table(collection_name, args.strict)
 
 if args.output == "csv":
     csv_file = collection_name.lower().replace(" ", "-") + ".csv"
