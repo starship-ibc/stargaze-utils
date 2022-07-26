@@ -1,4 +1,4 @@
-stargaze-ipfs.sqlite
+*.sqlite
 cache/collections/
 
 # Byte-compiled / optimized / DLL files
