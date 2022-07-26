@@ -178,14 +178,16 @@ def test_sg721_client_should_fetch_holders(sg_client):
     )
 
 
-@mock.patch("stargazeutils.ipfs.get")
 @mock.patch("stargazeutils.StargazeClient")
-def test_sg721_client_should_fetch_nft_collection(sg_client, ipfs_get_mock):
-    client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
+@mock.patch("stargazeutils.ipfs.IpfsClient")
+def test_sg721_client_should_fetch_nft_collection(sg_client, ipfs_client):
+    client = Sg721Client(
+        test_vals.sg721_addr, test_vals.minter_addr, sg_client, ipfs_client
+    )
     client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
     client._minter_config.num_tokens = len(test_vals.token_metadata)
 
-    ipfs_get_mock.side_effect = [MockResponse(m) for m in test_vals.token_metadata]
+    ipfs_client.get.side_effect = [MockResponse(m) for m in test_vals.token_metadata]
     collection = client.fetch_nft_collection()
 
     assert len(collection.tokens) == len(test_vals.token_traits)

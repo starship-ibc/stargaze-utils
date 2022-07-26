@@ -4,7 +4,7 @@ from typing import List, Set
 
 from stargazeutils.collection.nft_collection import NFTCollection
 
-from .. import ipfs
+from ..ipfs import IpfsClient
 from ..stargaze import StargazeClient
 from .collection_info import CollectionInfo
 from .minter_config import MinterConfig
@@ -39,7 +39,11 @@ class Sg721Client:
     """
 
     def __init__(
-        self, sg721: str, minter: str = None, sg_client: StargazeClient = None
+        self,
+        sg721: str,
+        minter: str = None,
+        sg_client: StargazeClient = None,
+        ipfs_client: IpfsClient = None,
     ):
         """Initializes the SG721Client with at least the SG721 address. If a minter
         address is not included, then it will be automatically queries from the
@@ -54,6 +58,7 @@ class Sg721Client:
         """
         self.sg721 = sg721
         self.sg_client = sg_client or StargazeClient()
+        self.ipfs = ipfs_client or IpfsClient()
 
         self.minter = minter or self.sg_client.fetch_sg721_minter(self.sg721)
         self._minter_config = None
@@ -249,7 +254,7 @@ class Sg721Client:
         url = f"{config.base_token_uri}/{token_id}"
 
         LOG.debug(f"Fetching attributes from {url}")
-        metadata = ipfs.get(url).json()
+        metadata = self.ipfs.get(url).json()
         traits = {}
         for attr in metadata["attributes"]:
             if "trait_value" in attr:

@@ -1,14 +1,16 @@
-from requests_mock import ANY as ANY_url
-
-from stargazeutils import ipfs
+from stargazeutils.ipfs import IpfsClient
 from tests.assets import test_vals
 
 
 def test_ipfs_should_get_response(requests_mock):
+    root_url = "https://example.com/"
+    ipfs = IpfsClient(ipfs_root=root_url)
+
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     expected_json = {"data": {"result": "success"}}
+    print(f"{root_url}ipfs/{test_vals.ipfs_cid}/path")
     requests_mock.get(
-        ANY_url,
+        f"{root_url}ipfs/{test_vals.ipfs_hash}/path",
         json=expected_json,
     )
 
@@ -17,10 +19,13 @@ def test_ipfs_should_get_response(requests_mock):
 
 
 def test_ipfs_should_retry(requests_mock):
+    root_url = "https://example.com/"
+    ipfs = IpfsClient(ipfs_root=root_url)
+
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     expected_json = {"data": {"result": "success"}}
     requests_mock.get(
-        ANY_url,
+        f"{root_url}ipfs/{test_vals.ipfs_hash}/path",
         [
             {"status_code": 500},
             {"status_code": 500},
@@ -33,9 +38,12 @@ def test_ipfs_should_retry(requests_mock):
 
 
 def test_ipfs_should_return_last_error(requests_mock):
+    root_url = "https://example.com/"
+    ipfs = IpfsClient(ipfs_root=root_url)
+
     url = f"ipfs://{test_vals.ipfs_cid}/path"
     requests_mock.get(
-        ANY_url,
+        f"{root_url}ipfs/{test_vals.ipfs_hash}/path",
         [{"status_code": 500}],
     )
 
