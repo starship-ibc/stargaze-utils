@@ -36,4 +36,4 @@ def test_minter_config_should_print(capsys):
     )
     m1.print()
     out = capsys.readouterr().out
-    assert len(out.split("\n")) == 9
+    assert len(out.split("\n")) == 10

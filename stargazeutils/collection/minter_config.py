@@ -66,6 +66,7 @@ class MinterConfig:
         print(f"SG721 address: {self.sg721_address}")
         print(f"Start time: {self.start_time.strftime(DATETIME_FMT)}")
         print(f"Unit price: {self.unit_price}")
+        print(f"Per address limit: {self.per_address_limit}")
         print(f"Whitelist: {self.whitelist}")
 
     @classmethod
