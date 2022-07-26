@@ -10,6 +10,12 @@
 # the script is run again, you will notice a distinct
 # increase in speed.
 #
+# If you have a private IPFS server, you can set the
+# following environment variable to your root ipfs
+# server.
+#
+#  - IPFS_ROOT=http://localhost:1234
+#
 # Usage:
 #   poetry run python3 examples/get_collection_info.py "<collection_name>"
 
@@ -20,29 +26,22 @@ import sys
 import requests_cache
 
 from stargazeutils.collection.sg721 import Sg721Client
+from stargazeutils.ipfs import IpfsClient
+from stargazeutils.stargaze import StargazeClient
 
-# We need to put this at the top before the inputs
-# so the system respects the configuration.
 logging.basicConfig(level=logging.INFO)
-
-# Setting this to DEBUG so we get a printout
-# of fetching the token traits if needed.
-logging.getLogger("stargazeutils.collection.sg721").setLevel(level=logging.DEBUG)
-
-from stargazeutils.stargaze import QueryMethod, StargazeClient  # noqa: E402
-
-requests_cache.install_cache("stargaze-ipfs")
-
-sg_client = StargazeClient(query_method=QueryMethod.BINARY)
-# sg_client.print_sg721_info(only_new=True)
 
 if len(sys.argv) < 2:
     print("No collection specified.")
     exit(0)
 
 collection_name = sys.argv[1]
+ipfs_root = os.environ.get("IPFS_ROOT", default="https://stargaze.mypinata.cloud")
 
-client = Sg721Client.from_collection_name(collection_name, sg_client)
+requests_cache.install_cache("stargaze-ipfs")
+sg_client = StargazeClient()
+ipfs_client = IpfsClient(ipfs_root)
+client = Sg721Client.from_collection_name(collection_name, sg_client, ipfs_client)
 
 if client is None:
     print(f"Collection '{collection_name}' not found.")
@@ -50,8 +49,11 @@ if client is None:
 
 print("")
 client.query_collection_info().print()
+print(f"Minter: {client.minter}")
 print("")
 client.query_minter_config().print()
+minted_tokens = client.query_num_minted_tokens()
+print(f"Minted tokens: {minted_tokens}")
 
 cache_dir = os.path.join(os.curdir, "cache", "collections")
 json_file = collection_name.lower().replace(" ", "-") + ".json"
