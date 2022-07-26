@@ -67,7 +67,10 @@ class Sg721Client:
 
     @classmethod
     def from_collection_name(
-        cls, collection_name: str, sg_client: StargazeClient = None, ipfs_client: IpfsClient = None
+        cls,
+        collection_name: str,
+        sg_client: StargazeClient = None,
+        ipfs_client: IpfsClient = None,
     ):
         """Initializes an SG721Client from a collection name. An optional
         StargazeClient may be provided, but if not a default one will be
