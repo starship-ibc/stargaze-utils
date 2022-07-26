@@ -44,7 +44,7 @@ class Coin:
     def __str__(self) -> str:
         if self.denom == "ustars":
             star_amount = self.amount / NATIVE_MULTIPLIER
-            return f"{star_amount} {self.denom[1:]}"
+            return f"{star_amount:,} ${self.denom[1:].upper()}"
         return f"{self.amount} {self.denom}"
 
     def get_stars(self):

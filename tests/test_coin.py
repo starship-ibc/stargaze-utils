@@ -24,8 +24,8 @@ def test_given_uneqal_denoms_should_be_unequal():
 
 
 def test_coin_string():
-    c1 = Coin("1000000", "ustars")
-    assert str(c1) == "1 stars"
+    c1 = Coin("12345000000", "ustars")
+    assert str(c1) == "12,345 $STARS"
     assert c1.__repr__() == str(c1)
 
     c1 = Coin("12", "uatom")
