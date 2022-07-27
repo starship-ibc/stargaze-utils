@@ -11,7 +11,7 @@ owner = "owner"
 ipfs_cid = "QmRvYPEHjsyXSg5UfqwnPoKMqcPuMHpo8ip5ReTCLh7621"
 ipfs_hash = "bafybeibvigt7h6ysdkr62zb2uq5tcwbmiapnby2t3otgbvogli5otzfg7y"
 collection_file = "tests/assets/eg_collection.json"
-
+traitless_collection_file = "tests/assets/traitless_collection.json"
 
 def str_from_timestamp(ts):
     return str(int((ts - EPOCH).total_seconds() * 1000)) + "000000"
