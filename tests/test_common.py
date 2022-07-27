@@ -1,4 +1,6 @@
-from stargazeutils.common import print_table
+import os
+
+from stargazeutils.common import export_table_csv, print_table
 
 
 def test_print_table(capsys):
@@ -52,3 +54,25 @@ def test_print_table_should_allow_header_footer(capsys):
     assert lines[1] == " | Number | Type1 | Type2   "
     assert lines[2] == " | 1      | Grass | Electric"
     assert lines[3] == "Goodbye"
+
+
+def test_export_csv():
+    table = [
+        ["Number", "Type1", "Type2"],
+        [1, "Grass", "Electric"],
+    ]
+
+    filename = "test-123.csv"
+    assert not os.path.exists(filename)
+
+    try:
+        export_table_csv(table, filename)
+        with open(filename) as f:
+            lines = f.readlines()
+        assert len(lines) == len(table)
+        assert lines[0] == '"Number","Type1","Type2"\n'
+        assert lines[1] == '"1","Grass","Electric"\n'
+    finally:
+        os.remove(filename)
+
+    assert not os.path.exists(filename)

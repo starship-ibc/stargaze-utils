@@ -151,6 +151,7 @@ def test_nft_collection_should_get_rarity_tables():
         ["- electric", 2, "50.00%"],
     ]
 
+
 def test_nft_collection_should_get_traitless_rarity_tables():
     collection = NFTCollection.from_json_file(
         test_vals.sg721_addr, test_vals.traitless_collection_file

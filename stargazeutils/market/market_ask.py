@@ -89,7 +89,7 @@ class MarketAsk:
         return True
 
     @property
-    def get_marketplace_url(self):
+    def marketplace_url(self):
         return (
             f"https://app.stargaze.zone/marketplace/{self.collection}/{self.token_id}"
         )

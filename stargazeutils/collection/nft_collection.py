@@ -165,7 +165,7 @@ class NFTCollection:
         traits = self.fetch_trait_rarity()
         if len(traits) == 0:
             return [["No traits"]]
-        
+
         total_tokens = sum(list(traits.values())[0].values())
         table = []
         table.append(["Total Tokens", total_tokens, ""])
