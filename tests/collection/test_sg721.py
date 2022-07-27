@@ -228,3 +228,25 @@ def test_sg721_client_should_return_none_when_collection_name_not_found(sg_clien
     client = Sg721Client.from_collection_name(test_vals.collection_name, sg_client)
 
     assert client is None
+
+
+@mock.patch("stargazeutils.StargazeClient")
+@mock.patch("stargazeutils.ipfs.IpfsClient")
+def test_sg721_client_should_fetch_traitless_nft_collection(sg_client, ipfs_client):
+    client = Sg721Client(
+        test_vals.sg721_addr, test_vals.minter_addr, sg_client, ipfs_client
+    )
+    client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
+    client._minter_config.num_tokens = len(test_vals.traitless_token_metadata)
+
+    ipfs_client.get.side_effect = [
+        MockResponse(m) for m in test_vals.traitless_token_metadata
+    ]
+    collection = client.fetch_nft_collection()
+
+    assert len(collection.tokens) == len(test_vals.traitless_token_metadata)
+    for id, token in collection.tokens.items():
+        expected_token = test_vals.traitless_token_traits[id]
+        assert len(token) == len(expected_token)
+        for k, v in token.items():
+            assert v == expected_token[k]

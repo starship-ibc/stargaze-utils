@@ -258,16 +258,8 @@ class Sg721Client:
 
         LOG.debug(f"Fetching attributes from {url}")
         metadata = self.ipfs.get(url).json()
+
         traits = {}
-        for attr in metadata["attributes"]:
-            if "trait_value" in attr:
-                trait = attr["trait_type"]
-                value = attr["trait_value"]
-                traits[trait] = value
-            elif "value" in attr:
-                trait = attr["trait_type"]
-                value = attr["value"]
-                traits[trait] = value
         traits["id"] = token_id
         traits["name"] = metadata["name"]
         traits["image"] = metadata["image"]
@@ -277,6 +269,19 @@ class Sg721Client:
             traits["dna"] = metadata["dna"]
         if "edition" in metadata:
             traits["edition"] = metadata["edition"]
+
+        if "attributes" not in metadata:
+            return traits
+
+        for attr in metadata["attributes"]:
+            if "trait_value" in attr:
+                trait = attr["trait_type"]
+                value = attr["trait_value"]
+                traits[trait] = value
+            elif "value" in attr:
+                trait = attr["trait_type"]
+                value = attr["value"]
+                traits[trait] = value
 
         return traits
 
