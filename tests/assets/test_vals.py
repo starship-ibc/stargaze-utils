@@ -11,6 +11,7 @@ owner = "owner"
 ipfs_cid = "QmRvYPEHjsyXSg5UfqwnPoKMqcPuMHpo8ip5ReTCLh7621"
 ipfs_hash = "bafybeibvigt7h6ysdkr62zb2uq5tcwbmiapnby2t3otgbvogli5otzfg7y"
 collection_file = "tests/assets/eg_collection.json"
+traitless_collection_file = "tests/assets/traitless_collection.json"
 
 
 def str_from_timestamp(ts):
@@ -95,6 +96,35 @@ token_traits = {
         "Bubble": "empty",
     },
 }
+
+traitless_token_metadata = [
+    {
+        "name": "Token #1",
+        "description": "test description",
+        "image": "ipfs://hash/images/1.png",
+    },
+    {
+        "name": "Token #2",
+        "description": "test description",
+        "image": "ipfs://hash/images/1.png",
+    },
+]
+
+traitless_token_traits = {
+    1: {
+        "id": 1,
+        "name": "Token #1",
+        "description": "test description",
+        "image": "ipfs://hash/images/1.png",
+    },
+    2: {
+        "id": 2,
+        "name": "Token #2",
+        "description": "test description",
+        "image": "ipfs://hash/images/1.png",
+    },
+}
+
 token_metadata = [
     {
         "name": "Stargaze Punks #1",

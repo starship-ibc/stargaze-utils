@@ -1,27 +1,8 @@
 #!/usr/bin/env python3
-#
-# This script fetches information for a given collection
-# and then begins fetching all token metadata from IPFS.
-# The initial fetch can take a while so if you want more
-# detailed feedback, set the logging level to DEBUG.
-#
-# Once the metadata has been fetched, it's exported to
-# JSON file in the "cache/collections" directory so if
-# the script is run again, you will notice a distinct
-# increase in speed.
-#
-# If you have a private IPFS server, you can set the
-# following environment variable to your root ipfs
-# server.
-#
-#  - IPFS_ROOT=http://localhost:1234
-#
-# Usage:
-#   poetry run python3 examples/get_collection_info.py "<collection_name>"
 
+import argparse
 import logging
 import os
-import sys
 
 import requests_cache
 
@@ -29,14 +10,51 @@ from stargazeutils.collection.sg721 import Sg721Client
 from stargazeutils.ipfs import IpfsClient
 from stargazeutils.stargaze import StargazeClient
 
-logging.basicConfig(level=logging.INFO)
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="""
+This script fetches information for a given collection and then
+begins fetching all token metadata from IPFS. The initial fetch
+can take a while so if you want more detailed feedback, set the
+logging level to DEBUG.
 
-if len(sys.argv) < 2:
-    print("No collection specified.")
-    exit(0)
+Once the metadata has been fetched, it's exported to JSON
+file in the "cache/collections" directory so if the script is
+run again, you will notice a distinct increase in speed.
 
-collection_name = sys.argv[1]
-ipfs_root = os.environ.get("IPFS_ROOT", default="https://stargaze.mypinata.cloud")
+If you have a private IPFS server, you also can set the IPFS_ROOT
+environment variable to your root ipfs server. If set via argument,
+any environment variable will be ignored.""",
+)
+
+parser.add_argument("collection_name", help="The name of the collection")
+parser.add_argument(
+    "--ipfs",
+    metavar="IPFS_ROOT",
+    type=str,
+    required=False,
+    help=(
+        "Use an optional IPFS root address."
+        "Can also be set via the IPFS_ROOT environment variable"
+    ),
+)
+parser.add_argument(
+    "--level",
+    metavar="LOG_LEVEL",
+    type=str,
+    required=False,
+    default="INFO",
+    help="Sets the logging level. Can be DEBUG, INFO, WARNING, or CRITIAL",
+)
+
+args = parser.parse_args()
+
+logging.basicConfig(level=args.level)
+
+collection_name = args.collection_name
+ipfs_root = args.ipfs or os.environ.get(
+    "IPFS_ROOT", default="https://stargaze.mypinata.cloud"
+)
 
 requests_cache.install_cache("stargaze-ipfs")
 sg_client = StargazeClient()

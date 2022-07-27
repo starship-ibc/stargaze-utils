@@ -2,7 +2,6 @@
 
 import argparse
 import os
-from typing import List
 
 from stargazeutils.collection import Sg721Client
 from stargazeutils.common import MARKET_CONTRACT, export_table_csv, print_table

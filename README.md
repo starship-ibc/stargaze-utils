@@ -47,8 +47,10 @@ The requests_cache package uses a sqlite database under the hood to store respon
 
 ## Donations
 
+A special thanks to [Andromeda Labs](https://twitter.com/AndromaverseLab) for sponsoring this library.
+
 If you'd like to make a donation, you may send $STARS to the following address. If you're like to sponsor a specific issue, feel free to include it in the memo line so I know what's most important to the community.
 
-```
+```txt
 stars1z6mj02l2s8v0vsxfsark5v7t076ds8pu9nj2fv
 ```

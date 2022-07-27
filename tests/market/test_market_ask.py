@@ -107,3 +107,11 @@ def test_market_ask_should_parse_json():
     assert ask.price == Coin.from_stars(15000)
     assert ask.reserve_for is None
     assert ask.token_id == test_vals.market_ask["token_id"]
+
+
+def test_market_asks_provides_url():
+    ask = MarketAsk.from_dict(test_vals.market_ask)
+    assert (
+        ask.marketplace_url
+        == f"https://app.stargaze.zone/marketplace/{ask.collection}/{ask.token_id}"
+    )

@@ -150,3 +150,12 @@ def test_nft_collection_should_get_rarity_tables():
         ["- fire", 1, "25.00%"],
         ["- electric", 2, "50.00%"],
     ]
+
+
+def test_nft_collection_should_get_traitless_rarity_tables():
+    collection = NFTCollection.from_json_file(
+        test_vals.sg721_addr, test_vals.traitless_collection_file
+    )
+    table = collection.get_trait_rarity_table()
+
+    assert table == [["No traits"]]
