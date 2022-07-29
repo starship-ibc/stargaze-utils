@@ -3,7 +3,7 @@
 This python package provides a set of utilities for interacting with the [Stargaze](https://www.stargaze.zone/) NFT blockchain.
 
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
+- [Usage](#usage)
 - [Examples](#examples)
 - [Caching](#caching)
 - [Donations](#donations)
@@ -16,17 +16,39 @@ This python package provides a set of utilities for interacting with the [Starga
 
 > If you don't have the starsd binary and want to try out, there is limited functionality by using the `QueryMethod.REST` query method passed in when creating your `StargazeClient`.
 
-## Installation
+## Usage
 
-You can install the package for use on your system with the following command:
+You can build the package for use in other projects:
+
+```sh
+poetry build
+```
+
+This will generate a .tar.gz and .whl file in the /dist directory. You can then install either of those with pip:
+
+```sh
+python3 -m pip install /dist/stargazeutils-*.tar.gz
+```
+
+You can then import the library with Python:
+
+```py
+from stargazeutils.collection.sg721 import Sg721Client
+
+client = Sg721Client.from_collection_name(collection_name)
+```
+
+## Examples
+
+There are some [examples](./examples) to get your started and some ideas on what you can do with the package. You can run the examples using poetry from this directory.
+
+First, install the dependencies:
 
 ```sh
 poetry install
 ```
 
-## Examples
-
-There are some [examples](./examples) to get your started and some ideas on what you can do with the package. You can run them through poetry, for example:
+Then run the example:
 
 ```sh
 poetry run python examples/get_new_collections.py
