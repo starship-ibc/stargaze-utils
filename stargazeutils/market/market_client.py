@@ -92,7 +92,7 @@ class MarketClient:
         asks = self.query_market(query)["data"]["asks"]
 
         while len(asks) > 0:
-            LOG.info(f"Quering asks after {start_after}")
+            LOG.info(f"Querying asks after {start_after}")
             for ask_data in asks:
                 ask = MarketAsk.from_dict(ask_data)
 
