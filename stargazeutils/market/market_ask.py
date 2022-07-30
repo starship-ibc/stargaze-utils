@@ -3,12 +3,9 @@ from datetime import datetime
 from enum import Enum
 
 from ..coin import Coin
-from ..common import timestamp_from_str
+from ..common import DEFAULT_MARKET_CONTRACT, timestamp_from_str
 
 LOG = logging.getLogger(__name__)
-
-MARKET_CONTRACT = "stars1fvhcnyddukcqfnt7nlwv3thm5we22lyxyxylr9h77cvgkcn43xfsvgv0pl"
-EPOCH = datetime.utcfromtimestamp(0)
 
 
 class SaleType(Enum):
@@ -58,7 +55,7 @@ class MarketAsk:
         self.approvals = None
         self.reason = InvalidAskReason.VALID
 
-    def is_valid(self):
+    def is_valid(self, market_contract=DEFAULT_MARKET_CONTRACT):
         if not self.is_active:
             self.reason = InvalidAskReason.NOT_ACTIVE
 
@@ -76,10 +73,10 @@ class MarketAsk:
                 a["spender"]: timestamp_from_str(a["expires"]["at_time"])
                 for a in self.approvals
             }
-            if MARKET_CONTRACT not in approval_list:
+            if market_contract not in approval_list:
                 self.reason = InvalidAskReason.NOT_APPROVED
 
-            elif approval_list[MARKET_CONTRACT] <= datetime.utcnow():
+            elif approval_list[market_contract] <= datetime.utcnow():
                 self.reason = InvalidAskReason.APPROVAL_EXPIRED
 
         if self.reason is not InvalidAskReason.VALID:

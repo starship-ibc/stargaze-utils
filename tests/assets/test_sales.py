@@ -1,7 +1,7 @@
 # flake8: noqa E501
 # JSON example
 
-from stargazeutils.common import MARKET_CONTRACT
+from stargazeutils.common import DEFAULT_MARKET_CONTRACT
 
 sales = {
     "total_count": "1",
@@ -33,7 +33,7 @@ sales = {
                             "attributes": [
                                 {
                                     "key": "recipient",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "sender", "value": "buyer-1"},
                                 {"key": "amount", "value": "1300000000ustars"},
@@ -43,7 +43,7 @@ sales = {
                                 },
                                 {
                                     "key": "sender",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "amount", "value": "13000000ustars"},
                                 {
@@ -52,7 +52,7 @@ sales = {
                                 },
                                 {
                                     "key": "sender",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "amount", "value": "13000000ustars"},
                                 {
@@ -61,13 +61,13 @@ sales = {
                                 },
                                 {
                                     "key": "sender",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "amount", "value": "91000000ustars"},
                                 {"key": "recipient", "value": "seller-1"},
                                 {
                                     "key": "sender",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "amount", "value": "1183000000ustars"},
                             ],
@@ -82,7 +82,7 @@ sales = {
                                 {"key": "action", "value": "transfer_nft"},
                                 {
                                     "key": "sender",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "recipient", "value": "buyer-1"},
                                 {"key": "token_id", "value": "6681"},
@@ -106,7 +106,7 @@ sales = {
                             "attributes": [
                                 {
                                     "key": "_contract_address",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {"key": "burn_amount", "value": "13000000"},
                                 {"key": "dist_amount", "value": "13000000"},
@@ -117,7 +117,7 @@ sales = {
                             "attributes": [
                                 {
                                     "key": "_contract_address",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {
                                     "key": "collection",
@@ -134,7 +134,7 @@ sales = {
                             "attributes": [
                                 {
                                     "key": "_contract_address",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {
                                     "key": "collection",
@@ -152,7 +152,7 @@ sales = {
                             "attributes": [
                                 {
                                     "key": "_contract_address",
-                                    "value": MARKET_CONTRACT,
+                                    "value": DEFAULT_MARKET_CONTRACT,
                                 },
                                 {
                                     "key": "collection",
@@ -177,7 +177,7 @@ sales = {
                             "type": "wasm/MsgExecuteContract",
                             "value": {
                                 "sender": "buyer-1",
-                                "contract": MARKET_CONTRACT,
+                                "contract": DEFAULT_MARKET_CONTRACT,
                                 "msg": {
                                     "set_bid": {
                                         "collection": "stars17s7emulfygjuk0xn906athk5e5efsdtumsat5n2nad7mtrg4xres3ysf3p",

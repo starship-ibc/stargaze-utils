@@ -96,14 +96,14 @@ class MarketClient:
             for ask_data in asks:
                 ask = MarketAsk.from_dict(ask_data)
 
-                if ask.is_valid() and strict_verify:
+                if ask.is_valid(self.contract) and strict_verify:
                     owner = self.sg_client.query_contract(
                         ask.collection, {"owner_of": {"token_id": str(ask.token_id)}}
                     )["data"]
                     ask.owner = owner["owner"]
                     ask.approvals = owner["approvals"]
 
-                if not exclude_invalid or ask.is_valid():
+                if not exclude_invalid or ask.is_valid(self.contract):
                     collection_asks.append(ask)
 
             start_after = asks[-1]["token_id"]
