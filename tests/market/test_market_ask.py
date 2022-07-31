@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from stargazeutils.coin import Coin
-from stargazeutils.common import EPOCH, DEFAULT_MARKET_CONTRACT, timestamp_from_str
+from stargazeutils.common import DEFAULT_MARKET_CONTRACT, EPOCH, timestamp_from_str
 from stargazeutils.market.market_ask import InvalidAskReason, MarketAsk, SaleType
 
 from ..assets import test_vals
@@ -44,8 +44,11 @@ def test_market_ask_is_valid_when_strict():
     ask.owner = test_vals.market_ask["seller"]
 
     expiration = str(int((ask.expiration - EPOCH).total_seconds() * 10000)) + "00000"
-    ask.approvals = [{"spender": DEFAULT_MARKET_CONTRACT, "expires": {"at_time": expiration}}]
+    ask.approvals = [
+        {"spender": DEFAULT_MARKET_CONTRACT, "expires": {"at_time": expiration}}
+    ]
     assert ask.is_valid()
+
 
 def test_market_ask_is_invalid_when_not_active():
     ask = MarketAsk.from_dict(test_vals.market_ask)
@@ -90,7 +93,10 @@ def test_market_ask_is_invalid_when_market_approval_expired():
     ask = MarketAsk.from_dict(test_vals.market_ask)
     ask.expiration = datetime.utcnow() + timedelta(1)
     ask.approvals = [
-        {"spender": DEFAULT_MARKET_CONTRACT, "expires": {"at_time": "1642999240605000000"}}
+        {
+            "spender": DEFAULT_MARKET_CONTRACT,
+            "expires": {"at_time": "1642999240605000000"},
+        }
     ]
     assert not ask.is_valid()
     assert ask.reason == InvalidAskReason.APPROVAL_EXPIRED

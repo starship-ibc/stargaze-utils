@@ -196,7 +196,7 @@ class StargazeClient:
             sg721["is_new"] = not self._sg721_cache.has_complete_data(contract)
             info = self.fetch_sg721_contract_info(contract)
             self.fetch_sg721_minter(contract)
-                
+
             sg721["info"] = info
             sg721s.append(sg721)
 
@@ -225,7 +225,7 @@ class StargazeClient:
         if len(contracts) == 0:
             print(f"No {new_str}collections found")
             return
-        
+
         print(f"Found {new_str}collections")
         for contract in contracts:
             print(f"- {contract['info']}")

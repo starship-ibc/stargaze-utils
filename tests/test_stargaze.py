@@ -243,10 +243,11 @@ def test_stargazeclient_should_query_txs_via_rest(requests_mock):
     r = client.query_txs(params)
     assert r == {"data": {}}
 
+
 @mock.patch("subprocess.check_output")
 def test_stargazeclient_should_update_cache(mock):
     mock.side_effect = mock_starsd
-    
+
     shutil.copyfile(cache_file, cache_backup)
     try:
         cache = SG721Cache(cache_file)
@@ -258,14 +259,13 @@ def test_stargazeclient_should_update_cache(mock):
 
     assert len(contracts) == 4
     assert contracts[0]["contract"] == "addr1"
-    assert contracts[0]["is_new"] == False
+    assert not contracts[0]["is_new"]
     assert contracts[1]["contract"] == "addr2"
-    assert contracts[1]["is_new"] == False
+    assert not contracts[1]["is_new"]
     assert contracts[2]["contract"] == "addr3"
-    assert contracts[2]["is_new"] == True
+    assert contracts[2]["is_new"]
     assert contracts[3]["contract"] == "addr4"
-    assert contracts[3]["is_new"] == True
-    
+    assert contracts[3]["is_new"]
 
 
 @mock.patch("subprocess.check_output")
@@ -286,6 +286,7 @@ def test_stargazeclient_should_print_sg721_info(mock, capsys):
     assert "- name2" in captured.out
     assert "- Collection 3" in captured.out
     assert "- Collection 4" in captured.out
+
 
 @mock.patch("subprocess.check_output")
 def test_stargazeclient_should_print_sg721_info_given_no_new(mock, capsys):

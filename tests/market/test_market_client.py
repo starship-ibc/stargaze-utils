@@ -16,7 +16,9 @@ def test_market_client_should_fetch_bids_by_bidder(sg_client):
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     client.fetch_bids_by_bidder(test_vals.sg721_addr)
 
-    sg_client.query_contract.assert_called_once_with(DEFAULT_MARKET_CONTRACT, expected_query)
+    sg_client.query_contract.assert_called_once_with(
+        DEFAULT_MARKET_CONTRACT, expected_query
+    )
 
 
 @mock.patch("stargazeutils.StargazeClient")
@@ -28,7 +30,9 @@ def test_market_client_should_fetch_ask_for_token(sg_client):
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     ask = client.fetch_ask_for_token(test_vals.sg721_addr, test_vals.sale_token_id)
 
-    sg_client.query_contract.assert_called_once_with(DEFAULT_MARKET_CONTRACT, expected_query)
+    sg_client.query_contract.assert_called_once_with(
+        DEFAULT_MARKET_CONTRACT, expected_query
+    )
     assert ask == MarketAsk.from_dict(test_vals.market_ask)
 
 
@@ -110,6 +114,7 @@ def test_market_client_fetch_asks_strict_verify_custom_marketplace(
     sg_client.query_contract.assert_called_with(market_contract, expected_query)
     assert asks.asks[0] == expected_ask
 
+
 @mock.patch("stargazeutils.StargazeClient")
 @mock.patch("stargazeutils.collection.NFTCollection")
 def test_market_client_should_fetch_filtered_asks(sg_client, mock_nft_collection):
@@ -120,7 +125,9 @@ def test_market_client_should_fetch_filtered_asks(sg_client, mock_nft_collection
     mock_nft_collection.sg721 = test_vals.sg721_addr
     asks = client.fetch_filtered_asks(mock_nft_collection, {})
 
-    sg_client.query_contract.assert_called_once_with(DEFAULT_MARKET_CONTRACT, expected_query)
+    sg_client.query_contract.assert_called_once_with(
+        DEFAULT_MARKET_CONTRACT, expected_query
+    )
     assert len(asks.asks) == 1
 
     expected_ask = MarketAsk.from_dict(test_vals.market_ask)

@@ -4,11 +4,11 @@ from typing import List
 from stargazeutils.market.ask_collection import AskCollection
 
 from ..collection import NFTCollection
+from ..common import DEFAULT_MARKET_CONTRACT
 from ..stargaze import StargazeClient
 from .market_ask import MarketAsk
 from .market_sale import MarketSale
 from .unstable_helper import fetch_unstable_paged_data
-from ..common import DEFAULT_MARKET_CONTRACT
 
 LOG = logging.getLogger(__name__)
 
@@ -16,7 +16,9 @@ LOG = logging.getLogger(__name__)
 class MarketClient:
     """Client for the Stargaze Marketplace contract"""
 
-    def __init__(self, contract: str = DEFAULT_MARKET_CONTRACT, sg_client: StargazeClient = None):
+    def __init__(
+        self, contract: str = DEFAULT_MARKET_CONTRACT, sg_client: StargazeClient = None
+    ):
         """Initializes the MarketClient.
 
         Arguments:

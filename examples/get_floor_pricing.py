@@ -50,7 +50,7 @@ def get_floor_pricing_table(
     collection_name: str,
     strict_validation: bool = True,
     num_prices: int = 3,
-    market_contract: str = DEFAULT_MARKET_CONTRACT
+    market_contract: str = DEFAULT_MARKET_CONTRACT,
 ) -> dict:
     print(f"Collection name: {collection_name}")
     print(f"Strict: {strict_validation}")
