@@ -287,6 +287,26 @@ def test_stargazeclient_should_print_sg721_info(mock, capsys):
     assert "- Collection 3" in captured.out
     assert "- Collection 4" in captured.out
 
+@mock.patch("subprocess.check_output")
+def test_stargazeclient_should_print_sg721_info_given_no_new(mock, capsys):
+    mock.side_effect = mock_starsd
+
+    shutil.copyfile(cache_file, cache_backup)
+    try:
+        cache = SG721Cache(cache_file)
+        client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
+        client.update_sg721_cache()
+        client.print_sg721_info(only_new=True)
+    finally:
+        shutil.copyfile(cache_backup, cache_file)
+        os.remove(cache_backup)
+
+    captured = capsys.readouterr()
+    assert "- name1" not in captured.out
+    assert "- name2" not in captured.out
+    assert "- Collection 3" not in captured.out
+    assert "- Collection 4" not in captured.out
+
 
 @mock.patch("subprocess.check_output")
 def test_stargazeclient_should_print_only_new_sg721_info(mock, capsys):

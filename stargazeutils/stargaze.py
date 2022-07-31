@@ -220,7 +220,11 @@ class StargazeClient:
 
         contracts = self.update_sg721_cache(sg721_code)
         if only_new:
-            contracts = filter(lambda c: c["is_new"], contracts)
+            contracts = list(filter(lambda c: c["is_new"], contracts))
+
+        if len(contracts) == 0:
+            print(f"No {new_str}collections found")
+            return
         
         print(f"Found {new_str}collections")
         for contract in contracts:
