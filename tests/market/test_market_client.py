@@ -26,7 +26,7 @@ def test_market_client_should_fetch_ask_for_token(sg_client):
     expected_query = {
         "ask": {"collection": test_vals.sg721_addr, "token_id": test_vals.sale_token_id}
     }
-    sg_client.query_contract.return_value = test_vals.market_ask
+    sg_client.query_contract.return_value = {"data": {"ask": test_vals.market_ask}}
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     ask = client.fetch_ask_for_token(test_vals.sg721_addr, test_vals.sale_token_id)
 

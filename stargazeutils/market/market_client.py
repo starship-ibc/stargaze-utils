@@ -52,7 +52,9 @@ class MarketClient:
         - token_id: The token to query"""
         LOG.info(f"Looking up ask for token: {token_id}")
         query = {"ask": {"collection": sg721, "token_id": token_id}}
-        ask = self.query_market(query)
+        ask = self.query_market(query)['data']['ask']
+        if ask is None:
+            return None
 
         return MarketAsk.from_dict(ask)
 
@@ -134,7 +136,8 @@ class MarketClient:
         asks = []
         for token_id in tokens:
             ask = self.fetch_ask_for_token(nft_collection.sg721, token_id)
-            asks.append(ask)
+            if ask is not None:
+                asks.append(ask)
 
         return AskCollection(asks, nft_collection)
 
