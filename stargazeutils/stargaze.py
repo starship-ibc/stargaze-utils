@@ -69,6 +69,8 @@ class StargazeClient:
         Arguments:
         - cmd: A list of strings that will be executed
         """
+        cmd.append("--output")
+        cmd.append("json")
         LOG.debug(f"Executing <{' '.join(cmd)}>")
         output = subprocess.check_output(cmd)
         return json.loads(output)
