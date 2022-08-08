@@ -37,6 +37,21 @@ def test_market_client_should_fetch_ask_for_token(sg_client):
 
 
 @mock.patch("stargazeutils.StargazeClient")
+def test_market_client_when_no_asks_fetch_ask_for_token_returns_none(sg_client):
+    expected_query = {
+        "ask": {"collection": test_vals.sg721_addr, "token_id": test_vals.sale_token_id}
+    }
+    sg_client.query_contract.return_value = {"data": {"ask": None}}
+    client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
+    ask = client.fetch_ask_for_token(test_vals.sg721_addr, test_vals.sale_token_id)
+
+    sg_client.query_contract.assert_called_once_with(
+        DEFAULT_MARKET_CONTRACT, expected_query
+    )
+    assert ask is None
+
+
+@mock.patch("stargazeutils.StargazeClient")
 @mock.patch("stargazeutils.collection.NFTCollection")
 def test_market_client_should_fetch_asks_for_collection(sg_client, mock_nft_collection):
     expected_query = {
