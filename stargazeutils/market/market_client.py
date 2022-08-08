@@ -52,7 +52,7 @@ class MarketClient:
         - token_id: The token to query"""
         LOG.info(f"Looking up ask for token: {token_id}")
         query = {"ask": {"collection": sg721, "token_id": token_id}}
-        ask = self.query_market(query)['data']['ask']
+        ask = self.query_market(query)["data"]["ask"]
         if ask is None:
             return None
 
