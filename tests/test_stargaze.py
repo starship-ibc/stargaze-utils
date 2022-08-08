@@ -57,6 +57,8 @@ def test_stargazeclient_can_query_contract_via_binary(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
     assert r == {}
     mock.assert_called_once_with(expected_args)
@@ -101,6 +103,8 @@ def test_stargazeclient_should_fetch_contracts(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     assert r == ["addr1", "addr2"]
@@ -132,6 +136,8 @@ def test_stargazeclient_should_fetch_paginated_contracts(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     assert r == ["addr1", "addr2", "addr3"]
@@ -161,6 +167,8 @@ def test_stargazeclient_should_fetch_sg721_info(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     mock.assert_called_once_with(expected_args)
@@ -209,6 +217,8 @@ def test_stargazeclient_should_fetch_minter(mock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     mock.assert_called_once_with(expected_args)
@@ -245,21 +255,68 @@ def test_stargazeclient_should_query_txs_via_rest(requests_mock):
 
 
 @mock.patch("subprocess.check_output")
+def test_stargazeclient_should_update_cache(mock):
+    mock.side_effect = mock_starsd
+
+    shutil.copyfile(cache_file, cache_backup)
+    try:
+        cache = SG721Cache(cache_file)
+        client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
+        contracts = client.update_sg721_cache()
+    finally:
+        shutil.copyfile(cache_backup, cache_file)
+        os.remove(cache_backup)
+
+    assert len(contracts) == 4
+    assert contracts[0]["contract"] == "addr1"
+    assert not contracts[0]["is_new"]
+    assert contracts[1]["contract"] == "addr2"
+    assert not contracts[1]["is_new"]
+    assert contracts[2]["contract"] == "addr3"
+    assert contracts[2]["is_new"]
+    assert contracts[3]["contract"] == "addr4"
+    assert contracts[3]["is_new"]
+
+
+@mock.patch("subprocess.check_output")
 def test_stargazeclient_should_print_sg721_info(mock, capsys):
     mock.side_effect = mock_starsd
 
     shutil.copyfile(cache_file, cache_backup)
-    cache = SG721Cache(cache_file)
-    client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
-    client.print_sg721_info(only_new=False)
-    shutil.copyfile(cache_backup, cache_file)
-    os.remove(cache_backup)
+    try:
+        cache = SG721Cache(cache_file)
+        client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
+        client.print_sg721_info(only_new=False)
+    finally:
+        shutil.copyfile(cache_backup, cache_file)
+        os.remove(cache_backup)
 
     captured = capsys.readouterr()
-    assert "name1" in captured.out
-    assert "name2" in captured.out
-    assert "Collection 3" in captured.out
-    assert "Collection 4" in captured.out
+    assert "- name1" in captured.out
+    assert "- name2" in captured.out
+    assert "- Collection 3" in captured.out
+    assert "- Collection 4" in captured.out
+
+
+@mock.patch("subprocess.check_output")
+def test_stargazeclient_should_print_sg721_info_given_no_new(mock, capsys):
+    mock.side_effect = mock_starsd
+
+    shutil.copyfile(cache_file, cache_backup)
+    try:
+        cache = SG721Cache(cache_file)
+        client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
+        client.update_sg721_cache()
+        client.print_sg721_info(only_new=True)
+    finally:
+        shutil.copyfile(cache_backup, cache_file)
+        os.remove(cache_backup)
+
+    captured = capsys.readouterr()
+    assert "- name1" not in captured.out
+    assert "- name2" not in captured.out
+    assert "- Collection 3" not in captured.out
+    assert "- Collection 4" not in captured.out
 
 
 @mock.patch("subprocess.check_output")
@@ -267,17 +324,19 @@ def test_stargazeclient_should_print_only_new_sg721_info(mock, capsys):
     mock.side_effect = mock_starsd
 
     shutil.copyfile(cache_file, cache_backup)
-    cache = SG721Cache(cache_file)
-    client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
-    client.print_sg721_info(only_new=True)
-    shutil.copyfile(cache_backup, cache_file)
-    os.remove(cache_backup)
+    try:
+        cache = SG721Cache(cache_file)
+        client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)
+        client.print_sg721_info(only_new=True)
+    finally:
+        shutil.copyfile(cache_backup, cache_file)
+        os.remove(cache_backup)
 
     captured = capsys.readouterr()
-    assert "name1" not in captured.out
-    assert "name2" not in captured.out
-    assert "Collection 3" in captured.out
-    assert "Collection 4" in captured.out
+    assert "- name1" not in captured.out
+    assert "- name2" not in captured.out
+    assert "- Collection 3" in captured.out
+    assert "- Collection 4" in captured.out
 
 
 @mock.patch("stargazeutils.cache.sg721_cache.SG721Cache")

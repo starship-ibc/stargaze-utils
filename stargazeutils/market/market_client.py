@@ -4,6 +4,7 @@ from typing import List
 from stargazeutils.market.ask_collection import AskCollection
 
 from ..collection import NFTCollection
+from ..common import DEFAULT_MARKET_CONTRACT
 from ..stargaze import StargazeClient
 from .market_ask import MarketAsk
 from .market_sale import MarketSale
@@ -15,7 +16,9 @@ LOG = logging.getLogger(__name__)
 class MarketClient:
     """Client for the Stargaze Marketplace contract"""
 
-    def __init__(self, contract: str, sg_client: StargazeClient = None):
+    def __init__(
+        self, contract: str = DEFAULT_MARKET_CONTRACT, sg_client: StargazeClient = None
+    ):
         """Initializes the MarketClient.
 
         Arguments:
@@ -49,7 +52,9 @@ class MarketClient:
         - token_id: The token to query"""
         LOG.info(f"Looking up ask for token: {token_id}")
         query = {"ask": {"collection": sg721, "token_id": token_id}}
-        ask = self.query_market(query)
+        ask = self.query_market(query)["data"]["ask"]
+        if ask is None:
+            return None
 
         return MarketAsk.from_dict(ask)
 
@@ -96,14 +101,14 @@ class MarketClient:
             for ask_data in asks:
                 ask = MarketAsk.from_dict(ask_data)
 
-                if ask.is_valid() and strict_verify:
+                if ask.is_valid(self.contract) and strict_verify:
                     owner = self.sg_client.query_contract(
                         ask.collection, {"owner_of": {"token_id": str(ask.token_id)}}
                     )["data"]
                     ask.owner = owner["owner"]
                     ask.approvals = owner["approvals"]
 
-                if not exclude_invalid or ask.is_valid():
+                if not exclude_invalid or ask.is_valid(self.contract):
                     collection_asks.append(ask)
 
             start_after = asks[-1]["token_id"]
@@ -131,7 +136,8 @@ class MarketClient:
         asks = []
         for token_id in tokens:
             ask = self.fetch_ask_for_token(nft_collection.sg721, token_id)
-            asks.append(ask)
+            if ask is not None:
+                asks.append(ask)
 
         return AskCollection(asks, nft_collection)
 

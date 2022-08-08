@@ -4,8 +4,9 @@ import argparse
 import os
 
 from stargazeutils.collection import Sg721Client
-from stargazeutils.common import MARKET_CONTRACT, export_table_csv, print_table
+from stargazeutils.common import export_table_csv, print_table
 from stargazeutils.market import MarketClient
+from stargazeutils.market.market_ask import DEFAULT_MARKET_CONTRACT
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -49,11 +50,12 @@ def get_floor_pricing_table(
     collection_name: str,
     strict_validation: bool = True,
     num_prices: int = 3,
+    market_contract: str = DEFAULT_MARKET_CONTRACT,
 ) -> dict:
     print(f"Collection name: {collection_name}")
     print(f"Strict: {strict_validation}")
 
-    market = MarketClient(MARKET_CONTRACT)
+    market = MarketClient(market_contract)
     client = Sg721Client.from_collection_name(collection_name)
 
     cache_dir = os.path.join(os.curdir, "cache", "collections")

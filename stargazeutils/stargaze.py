@@ -69,6 +69,8 @@ class StargazeClient:
         Arguments:
         - cmd: A list of strings that will be executed
         """
+        cmd.append("--output")
+        cmd.append("json")
         LOG.debug(f"Executing <{' '.join(cmd)}>")
         output = subprocess.check_output(cmd)
         return json.loads(output)
@@ -188,7 +190,22 @@ class StargazeClient:
         minter = self.query_contract(sg721, {"minter": {}})["data"]["minter"]
         return self._sg721_cache.update_sg721_minter(sg721, minter)
 
-    def print_sg721_info(self, only_new=False):
+    def update_sg721_cache(self, sg721_code=1) -> List[dict]:
+        sg721s = []
+        for contract in self.fetch_contracts(sg721_code):
+            LOG.debug(f"Fetching info for {contract}")
+            sg721 = {"contract": contract, "is_new": False}
+            sg721["is_new"] = not self._sg721_cache.has_complete_data(contract)
+            info = self.fetch_sg721_contract_info(contract)
+            self.fetch_sg721_minter(contract)
+
+            sg721["info"] = info
+            sg721s.append(sg721)
+
+        self._sg721_cache.save_csv()
+        return sg721s
+
+    def print_sg721_info(self, only_new=False, sg721_code=1):
         """Fetch all NFT collections and then print the
         collection names. By default, only non-cached will
         be printed.
@@ -203,17 +220,15 @@ class StargazeClient:
         - only_new: Print only the new (non-cached) collections"""
         new_str = "new " if only_new else ""
 
-        new_collection_str = ""
-        for contract in self.fetch_contracts(1):
-            LOG.debug(f"Fetching info for {contract}")
-            if not only_new or not self._sg721_cache.has_complete_data(contract):
-                info = self.fetch_sg721_contract_info(contract)
-                self.fetch_sg721_minter(contract)
+        contracts = self.update_sg721_cache(sg721_code)
+        if only_new:
+            contracts = list(filter(lambda c: c["is_new"], contracts))
 
-                new_collection_str += f"- {info.name}\n"
+        if len(contracts) == 0:
+            print(f"No {new_str}collections found")
+            return
 
-        self._sg721_cache.save_csv()
-        if len(new_collection_str) > 0:
-            print(f"Found {new_str}collections")
-            print(new_collection_str)
-            print("-----")
+        print(f"Found {new_str}collections")
+        for contract in contracts:
+            print(f"- {contract['info']}")
+        print("-----")

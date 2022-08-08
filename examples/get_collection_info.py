@@ -50,6 +50,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 logging.basicConfig(level=args.level)
+logging.getLogger("requests_cache").setLevel(logging.INFO)
+logging.getLogger("urllib3").setLevel(logging.INFO)
 
 collection_name = args.collection_name
 ipfs_root = args.ipfs or os.environ.get(

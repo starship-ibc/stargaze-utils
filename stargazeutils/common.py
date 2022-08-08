@@ -4,7 +4,13 @@ from typing import List
 
 EPOCH = datetime.utcfromtimestamp(0)
 DATETIME_FMT = "%a %m-%d %I:%M %p"
-MARKET_CONTRACT = "stars1fvhcnyddukcqfnt7nlwv3thm5we22lyxyxylr9h77cvgkcn43xfsvgv0pl"
+DEFAULT_MARKET_CONTRACT = (
+    "stars1fvhcnyddukcqfnt7nlwv3thm5we22lyxyxylr9h77cvgkcn43xfsvgv0pl"
+)
+
+
+def str_from_timestamp(ts):
+    return str(int((ts - EPOCH).total_seconds() * 1000)) + "000000"
 
 
 def timestamp_from_str(ts):
