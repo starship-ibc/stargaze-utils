@@ -119,7 +119,10 @@ def test_market_client_fetch_asks_strict_verify_custom_marketplace(
 @mock.patch("stargazeutils.collection.NFTCollection")
 def test_market_client_should_fetch_filtered_asks(sg_client, mock_nft_collection):
     expected_query = {"ask": {"collection": test_vals.sg721_addr, "token_id": 1}}
-    sg_client.query_contract.side_effect = [test_vals.market_ask, []]
+    sg_client.query_contract.side_effect = [
+        {"data": {"ask": test_vals.market_ask}},
+        {"data": {"ask": {}}},
+    ]
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     mock_nft_collection.filter_tokens.return_value = {1}
     mock_nft_collection.sg721 = test_vals.sg721_addr

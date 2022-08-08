@@ -57,6 +57,8 @@ def test_stargazeclient_can_query_contract_via_binary(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
     assert r == {}
     mock.assert_called_once_with(expected_args)
@@ -101,6 +103,8 @@ def test_stargazeclient_should_fetch_contracts(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     assert r == ["addr1", "addr2"]
@@ -132,6 +136,8 @@ def test_stargazeclient_should_fetch_paginated_contracts(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     assert r == ["addr1", "addr2", "addr3"]
@@ -161,6 +167,8 @@ def test_stargazeclient_should_fetch_sg721_info(mock: MagicMock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     mock.assert_called_once_with(expected_args)
@@ -209,6 +217,8 @@ def test_stargazeclient_should_fetch_minter(mock):
         client.node,
         "--chain-id",
         client.chain_id,
+        "--output",
+        "json",
     ]
 
     mock.assert_called_once_with(expected_args)
