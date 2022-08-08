@@ -28,7 +28,7 @@ class StargazeClient:
     def __init__(
         self,
         node: str = "https://rpc.stargaze-apis.com:443/",
-        chain_id: str = "stargaze",
+        chain_id: str = "stargaze-1",
         rest_url: str = "https://rest.stargaze-apis.com",
         query_method: QueryMethod = QueryMethod.BINARY,
         sg721_cache: SG721Cache = None,
