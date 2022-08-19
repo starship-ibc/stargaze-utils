@@ -70,3 +70,9 @@ class Coin:
         :return A new Coin
         :rtype Coin"""
         return cls(Decimal(stars) * NATIVE_MULTIPLIER, NATIVE_DENOM)
+
+    def to_serializable(self):
+        return {
+            "amount": str(self.amount),
+            "denom": self.denom,
+        }
