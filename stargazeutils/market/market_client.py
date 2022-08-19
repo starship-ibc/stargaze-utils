@@ -47,6 +47,11 @@ class MarketClient:
         # Always strict verify because we shouldn't need to make many calls.
         for ask_dict in asks:
             ask = MarketAsk.from_dict(ask_dict)
+
+            # This should usually be a cached call.
+            contract_info = self.sg_client.fetch_sg721_contract_info(ask.collection)
+            ask.collection_name = contract_info.name
+
             owner_query = {"owner_of": {"token_id": str(ask.token_id)}}
             owner = self.sg_client.query_contract(ask.collection, owner_query)["data"]
             ask.owner = owner["owner"]
