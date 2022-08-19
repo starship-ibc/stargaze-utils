@@ -4,7 +4,7 @@ import argparse
 import os
 
 from stargazeutils.collection import Sg721Client
-from stargazeutils.common import export_table_csv, print_table
+from stargazeutils.common import export_table_csv, print_table, slugified
 from stargazeutils.market import MarketClient
 from stargazeutils.market.market_ask import DEFAULT_MARKET_CONTRACT
 
@@ -59,7 +59,7 @@ def get_floor_pricing_table(
     client = Sg721Client.from_collection_name(collection_name)
 
     cache_dir = os.path.join(os.curdir, "cache", "collections")
-    json_file = collection_name.lower().replace(" ", "-") + ".json"
+    json_file = slugified(collection_name)
     json_trait_cache_file = os.path.join(cache_dir, json_file)
 
     print("")
@@ -102,7 +102,7 @@ collection_name = args.collection
 table = get_floor_pricing_table(collection_name, args.strict)
 
 if args.output == "csv":
-    csv_file = collection_name.lower().replace(" ", "-") + ".csv"
+    csv_file = slugified(collection_name) + ".csv"
     export_table_csv(table, csv_file)
     exit(0)
 
