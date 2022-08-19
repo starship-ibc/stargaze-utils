@@ -19,7 +19,7 @@ def test_wallet_should_get_balances(mock_cli):
     ]
 
     mock_cli.return_value = json.dumps({"balances": expected_balances})
-    coins = wallet.get_balances()
+    coins = wallet.get_coins()
 
     assert len(coins) == len(expected_balances)
     assert coins[0] == Coin(

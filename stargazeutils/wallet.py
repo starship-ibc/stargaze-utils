@@ -54,18 +54,19 @@ class Wallet:
             "1.15",
         ]
 
-        print("##############################################################")
-        print("#                                                            #")
-        print(f"# Loaded wallet {self.address:44} #")
+        print("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+        print("┃                    🚨 DANGER!  DANGER! 🚨                    ┃")
+        print("┃                                                              ┃")
+        print(f"┃  Loaded wallet {self.address:44}  ┃")
         keyring_msg = f"with expected backend keyring {self.keyring_backend:7}"
-        print(f"# {keyring_msg}                      #")
-        print("#                                                            #")
-        print("# THIS APPLICATION MAY USE STARSD TO AUTO-SIGN TRANSACTIONS! #")
-        print("# PLEASE USE CAUTION!                                        #")
-        print("#                                                            #")
-        print("##############################################################")
+        print(f"┃  {keyring_msg}                       ┃")
+        print("┃                                                              ┃")
+        print("┃  THIS APPLICATION MAY USE STARSD TO AUTO-SIGN TRANSACTIONS!  ┃")
+        print("┃  PLEASE USE CAUTION!                                         ┃")
+        print("┃                                                              ┃")
+        print("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
 
-    def get_balances(self) -> List[Coin]:
+    def get_coins(self) -> List[Coin]:
         """Gets a list of coins that show the current balances of the
         address. For now, it's likely to either be 0 or 1 coin ($STARS).
         """
@@ -77,8 +78,7 @@ class Wallet:
         return coins
 
     def query_owned_tokens(self, collection):
-        """Queries for the tokens in a collection owned by the wallet.
-        """
+        """Queries for the tokens in a collection owned by the wallet."""
         client = Sg721Client(collection, sg_client=self.sg_client)
         return client.query_tokens_owned_by(self.address)
 
@@ -126,7 +126,10 @@ class Wallet:
         self, collection: str, token_id: int, price: Coin, auto_sign: bool = False
     ):
         """Sets a bid for a token in a specific collection at a given price."""
-        LOG.info(f"Setting bid on {collection} #{token_id} @ {price} (auto_sign = {auto_sign})")
+        LOG.info(
+            f"Setting bid on {collection} "
+            f"#{token_id} @ {price} (auto_sign = {auto_sign})"
+        )
         query = {
             "set_bid": {
                 "collection": collection,
