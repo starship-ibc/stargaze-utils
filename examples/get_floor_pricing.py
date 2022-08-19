@@ -85,7 +85,7 @@ def get_floor_pricing_table(
     ]
     expected_length = 3 + (num_prices * 2)
     for trait, values in trait_asks.items():
-        if trait in ["hubble_rank", "id", "image", "name"]:
+        if trait in ["hubble_rank", "id", "image", "name", "Identity Number"]:
             continue
         for value, asks in values.items():
             row = [trait, value, str(len(asks))]
