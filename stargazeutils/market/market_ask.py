@@ -41,7 +41,7 @@ class MarketAsk:
         funds_recipient: str = None,
         reserve_for: str = None,
         is_active: bool = True,
-        collection_name: str = None
+        collection_name: str = None,
     ):
         self.collection = collection
         self.collection_name = collection_name or collection
@@ -94,9 +94,7 @@ class MarketAsk:
         )
 
     def __repr__(self):
-        return (
-            f"<MarketAsk for {self.collection_name} token {self.token_id} of {self.price}>"
-        )
+        return f"<MarketAsk for {self.collection_name} token {self.token_id} of {self.price}>"
 
     def __eq__(self, o: object) -> bool:
         if type(o) is not type(self):
@@ -131,7 +129,7 @@ class MarketAsk:
 
     def to_serializable(self):
         return {
-            "collection":  self.collection,
+            "collection": self.collection,
             "collection_name": self.collection_name,
             "token_id": self.token_id,
             "seller": self.seller,
