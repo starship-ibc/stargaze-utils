@@ -35,6 +35,26 @@ class MarketClient:
         - query: The market contract query"""
         return self.sg_client.query_contract(self.contract, query)
 
+    def query_floor_price(self, sg721: str, count: int = 20) -> List[MarketAsk]:
+        query = {"asks_sorted_by_price": {
+            "collection": sg721,
+            "limit": count,}
+        }
+        asks = self.query_market(query)['data']['asks']
+
+        # Always strict verify because we shouldn't need to make many calls.
+        for ask_dict in asks:
+            ask = MarketAsk.from_dict(ask_dict)
+            owner_query = {"owner_of": {"token_id": str(ask.token_id)}}
+            owner = self.sg_client.query_contract(ask.collection, owner_query)['data']
+            ask.owner = owner["owner"]
+            ask.approvals = owner["approvals"]
+            if ask.is_valid(self.contract):
+                return ask
+
+        LOG.warning(f"Valid ask not found within the first {count} results")
+        return None
+
     def fetch_bids_by_bidder(self, bidder: str) -> dict:
         """Fetches all bids for a given bidder.
 
