@@ -42,6 +42,7 @@ class MarketAsk:
         reserve_for: str = None,
         is_active: bool = True,
         collection_name: str = None,
+        tx_hash: str = None,
     ):
         self.collection = collection
         self.collection_name = collection_name or collection
@@ -53,6 +54,7 @@ class MarketAsk:
         self.funds_recipient = funds_recipient or self.seller
         self.reserve_for = reserve_for
         self.is_active = is_active
+        self.tx_hash = tx_hash
         self.owner = None
         self.approvals = None
         self.reason = InvalidAskReason.VALID
@@ -94,7 +96,10 @@ class MarketAsk:
         )
 
     def __repr__(self):
-        return f"<MarketAsk for {self.collection_name} token {self.token_id} of {self.price}>"
+        return (
+            f"<MarketAsk for {self.collection_name} token "
+            f"{self.token_id} of {self.price}>"
+        )
 
     def __eq__(self, o: object) -> bool:
         if type(o) is not type(self):
@@ -140,5 +145,6 @@ class MarketAsk:
             "reserve_for": self.reserve_for,
             "is_active": self.is_active,
             "owner": self.owner,
-            "reason": self.reason,
+            "reason": self.reason.name,
+            "tx_hash": self.tx_hash,
         }

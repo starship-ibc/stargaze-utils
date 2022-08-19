@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 
 from stargazeutils.coin import Coin
@@ -120,3 +121,25 @@ def test_market_asks_provides_url():
         ask.marketplace_url
         == f"https://app.stargaze.zone/marketplace/{ask.collection}/{ask.token_id}"
     )
+
+
+def test_market_ask_is_serializable():
+    expiration = datetime.utcnow() + timedelta(1)
+    ask = MarketAsk("stars1-c", 1, "s1", Coin.from_stars(1), expiration)
+    ask.collection_name = "c1"
+
+    s = ask.to_serializable()
+    json.dumps(s)
+
+    assert s["collection"] == ask.collection
+    assert s["collection_name"] == ask.collection_name
+    assert s["price"] == ask.price.to_serializable()
+    assert s["seller"] == ask.seller
+    assert s["expiration"] == str(ask.expiration)
+    assert s["token_id"] == ask.token_id
+    assert s["sale_type"] == ask.sale_type.name
+    assert s["funds_recipient"] == ask.funds_recipient
+    assert s["reserve_for"] == ask.reserve_for
+    assert s["is_active"] == ask.is_active
+    assert s["owner"] == ask.owner
+    assert s["reason"] == ask.reason.name
