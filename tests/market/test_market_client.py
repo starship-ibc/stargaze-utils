@@ -26,7 +26,7 @@ def test_market_client_should_fetch_ask_for_token(sg_client):
     expected_query = {
         "ask": {"collection": test_vals.sg721_addr, "token_id": test_vals.sale_token_id}
     }
-    sg_client.query_contract.return_value = {"data": {"ask": test_vals.market_ask}}
+    sg_client.query_contract.return_value = {"ask": test_vals.market_ask}
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     ask = client.fetch_ask_for_token(test_vals.sg721_addr, test_vals.sale_token_id)
 
@@ -41,7 +41,7 @@ def test_market_client_when_no_asks_fetch_ask_for_token_returns_none(sg_client):
     expected_query = {
         "ask": {"collection": test_vals.sg721_addr, "token_id": test_vals.sale_token_id}
     }
-    sg_client.query_contract.return_value = {"data": {"ask": None}}
+    sg_client.query_contract.return_value = {"ask": None}
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     ask = client.fetch_ask_for_token(test_vals.sg721_addr, test_vals.sale_token_id)
 
@@ -58,8 +58,8 @@ def test_market_client_should_fetch_asks_for_collection(sg_client, mock_nft_coll
         "asks": {"collection": test_vals.sg721_addr, "start_after": 1, "limit": 100}
     }
     sg_client.query_contract.side_effect = [
-        {"data": {"asks": [test_vals.market_ask]}},
-        {"data": {"asks": []}},
+        {"asks": [test_vals.market_ask]},
+        {"asks": []},
     ]
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     mock_nft_collection.sg721 = test_vals.sg721_addr
@@ -87,9 +87,9 @@ def test_market_client_when_fetch_asks_for_collection_should_strict_verify(
     expected_ask.approvals = approvals
     expected_ask.owner = expected_ask.seller
     sg_client.query_contract.side_effect = [
-        {"data": {"asks": [test_vals.market_ask]}},
-        {"data": {"owner": expected_ask.owner, "approvals": approvals}},
-        {"data": {"asks": []}},
+        {"asks": [test_vals.market_ask]},
+        {"owner": expected_ask.owner, "approvals": approvals},
+        {"asks": []},
     ]
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     mock_nft_collection.sg721 = test_vals.sg721_addr
@@ -118,9 +118,9 @@ def test_market_client_fetch_asks_strict_verify_custom_marketplace(
     expected_ask.approvals = approvals
     expected_ask.owner = expected_ask.seller
     sg_client.query_contract.side_effect = [
-        {"data": {"asks": [test_vals.market_ask]}},
-        {"data": {"owner": expected_ask.owner, "approvals": approvals}},
-        {"data": {"asks": []}},
+        {"asks": [test_vals.market_ask]},
+        {"owner": expected_ask.owner, "approvals": approvals},
+        {"asks": []},
     ]
     client = MarketClient(market_contract, sg_client)
     mock_nft_collection.sg721 = test_vals.sg721_addr
@@ -135,8 +135,8 @@ def test_market_client_fetch_asks_strict_verify_custom_marketplace(
 def test_market_client_should_fetch_filtered_asks(sg_client, mock_nft_collection):
     expected_query = {"ask": {"collection": test_vals.sg721_addr, "token_id": 1}}
     sg_client.query_contract.side_effect = [
-        {"data": {"ask": test_vals.market_ask}},
-        {"data": {"ask": {}}},
+        {"ask": test_vals.market_ask},
+        {"ask": {}},
     ]
     client = MarketClient(DEFAULT_MARKET_CONTRACT, sg_client)
     mock_nft_collection.filter_tokens.return_value = {1}

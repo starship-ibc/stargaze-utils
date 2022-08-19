@@ -42,7 +42,7 @@ class MarketClient:
                 "limit": count,
             }
         }
-        asks = self.query_market(query)["data"]["asks"]
+        asks = self.query_market(query)["asks"]
 
         # Always strict verify because we shouldn't need to make many calls.
         for ask_dict in asks:
@@ -53,7 +53,7 @@ class MarketClient:
             ask.collection_name = contract_info.name
 
             owner_query = {"owner_of": {"token_id": str(ask.token_id)}}
-            owner = self.sg_client.query_contract(ask.collection, owner_query)["data"]
+            owner = self.sg_client.query_contract(ask.collection, owner_query)
             ask.owner = owner["owner"]
             ask.approvals = owner["approvals"]
             if ask.is_valid(self.contract):
@@ -79,7 +79,7 @@ class MarketClient:
         - token_id: The token to query"""
         LOG.info(f"Looking up ask for token: {token_id}")
         query = {"ask": {"collection": sg721, "token_id": token_id}}
-        ask = self.query_market(query)["data"]["ask"]
+        ask = self.query_market(query)["ask"]
         if ask is None:
             return None
 
@@ -91,7 +91,7 @@ class MarketClient:
     #     Arguments:
     #     - sg721: The sg721 address to check"""
     #     query = {"ask_count": {"collection": sg721}}
-    #     return self.query_market(query)["data"]["count"]
+    #     return self.query_market(query)["count"]
 
     # def remove_bid(self, sg721: str, token_id: int, wallet: str):
     #     cmd = {"remove_bid": {"collection": sg721, "token_id": token_id}}
@@ -121,7 +121,7 @@ class MarketClient:
                 "limit": limit,
             }
         }
-        asks = self.query_market(query)["data"]["asks"]
+        asks = self.query_market(query)["asks"]
 
         while len(asks) > 0:
             LOG.info(f"Querying asks after {start_after}")
@@ -131,7 +131,7 @@ class MarketClient:
                 if ask.is_valid(self.contract) and strict_verify:
                     owner = self.sg_client.query_contract(
                         ask.collection, {"owner_of": {"token_id": str(ask.token_id)}}
-                    )["data"]
+                    )
                     ask.owner = owner["owner"]
                     ask.approvals = owner["approvals"]
 
@@ -146,7 +146,7 @@ class MarketClient:
                     "limit": limit,
                 }
             }
-            asks = self.query_market(query)["data"]["asks"]
+            asks = self.query_market(query)["asks"]
 
         return AskCollection(collection_asks, nft_collection)
 
