@@ -63,3 +63,10 @@ def test_coin_should_get_stars():
 def test_coin_should_not_get_stars_from_other_denom():
     c = Coin("123", "atom")
     assert c.get_stars() is None
+
+
+def test_coin_is_serializable():
+    c = Coin.from_stars(10)
+    d = c.to_serializable()
+    assert d["amount"] == str(c.amount)
+    assert d["denom"] == c.denom
