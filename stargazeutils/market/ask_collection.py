@@ -22,7 +22,7 @@ class AskCollection:
         self.asks = asks
         self.token_info = token_info
 
-    def create_asks_by_trait(self) -> dict:
+    def create_asks_by_trait(self) -> dict[str,dict[str,List[dict]]]:
         """Creates a dictionary of  asks by trait
         including the metadata. The returning dictionary
         follows the pattern:
