@@ -59,7 +59,7 @@ def get_floor_pricing_table(
     client = Sg721Client.from_collection_name(collection_name)
 
     cache_dir = os.path.join(os.curdir, "cache", "collections")
-    json_file = slugified(collection_name)
+    json_file = slugified(collection_name) + ".json"
     json_trait_cache_file = os.path.join(cache_dir, json_file)
 
     print("")
@@ -87,7 +87,8 @@ def get_floor_pricing_table(
     for trait, values in trait_asks.items():
         if trait in ["hubble_rank", "id", "image", "name", "Identity Number"]:
             continue
-        for value, asks in values.items():
+        
+        for value, asks in sorted(values.items(), key=lambda i: i[1][0]['ask'].price):
             row = [trait, value, str(len(asks))]
             for ask in asks[:num_prices]:
                 row.extend([str(ask["ask"].price), str(ask["ask"].token_id)])
