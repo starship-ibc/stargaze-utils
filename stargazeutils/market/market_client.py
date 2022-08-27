@@ -3,6 +3,7 @@ from typing import List
 
 from stargazeutils.market.ask_collection import AskCollection
 
+from ..errors import QueryError
 from ..collection import NFTCollection
 from ..common import DEFAULT_MARKET_CONTRACT
 from ..stargaze import StargazeClient
@@ -53,7 +54,14 @@ class MarketClient:
             ask.collection_name = contract_info.name
 
             owner_query = {"owner_of": {"token_id": str(ask.token_id)}}
-            owner = self.sg_client.query_contract(ask.collection, owner_query)
+
+            try:
+                owner = self.sg_client.query_contract(ask.collection, owner_query)
+            except QueryError as e:
+                LOG.warning("Possilble burnt token on the floor")
+                LOG.warning(f"{ask.collection} ({ask.collection_name}) #{ask.token_id}")
+                continue
+
             ask.owner = owner["owner"]
             ask.approvals = owner["approvals"]
             if ask.is_valid(self.contract):
