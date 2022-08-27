@@ -63,6 +63,7 @@ requests_cache.install_cache("stargaze-ipfs")
 sg_client = StargazeClient()
 ipfs_client = IpfsClient(ipfs_root)
 client = Sg721Client.from_collection_name(collection_name, sg_client, ipfs_client)
+print(client.query_contract_info())
 
 if client is None:
     print(f"Collection '{collection_name}' not found.")
