@@ -11,11 +11,14 @@ LOG = logging.getLogger(__name__)
 class SaleType(Enum):
     UNSUPPORTED = 1
     FIXED_PRICE = 2
+    AUCTION = 3
 
     @classmethod
     def from_str(cls, s):
         if s == "fixed_price":
             return cls.FIXED_PRICE
+        if s == "auction":
+            return cls.AUCTION
         return cls.UNSUPPORTED
 
 
@@ -97,7 +100,7 @@ class MarketAsk:
 
     def __repr__(self):
         return (
-            f"<MarketAsk for {self.collection_name} token "
+            f"<MarketAsk {self.sale_type} for {self.collection_name} token "
             f"{self.token_id} of {self.price}>"
         )
 

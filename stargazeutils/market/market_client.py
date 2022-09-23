@@ -7,7 +7,7 @@ from ..errors import QueryError
 from ..collection import NFTCollection
 from ..common import DEFAULT_MARKET_CONTRACT
 from ..stargaze import StargazeClient
-from .market_ask import MarketAsk
+from .market_ask import MarketAsk, SaleType
 from .market_sale import MarketSale
 from .unstable_helper import fetch_unstable_paged_data
 
@@ -36,7 +36,7 @@ class MarketClient:
         - query: The market contract query"""
         return self.sg_client.query_contract(self.contract, query)
 
-    def query_floor_price(self, sg721: str, count: int = 20) -> List[MarketAsk]:
+    def query_floor_price(self, sg721: str, count: int = 30) -> List[MarketAsk]:
         query = {
             "asks_sorted_by_price": {
                 "collection": sg721,
@@ -48,6 +48,11 @@ class MarketClient:
         # Always strict verify because we shouldn't need to make many calls.
         for ask_dict in asks:
             ask = MarketAsk.from_dict(ask_dict)
+
+            # Ignore auction floors
+            if ask.sale_type != SaleType.FIXED_PRICE:
+                LOG.warning(f"Ignoring {ask.sale_type} ask for token {ask.token_id}")
+                continue
 
             # This should usually be a cached call.
             contract_info = self.sg_client.fetch_sg721_contract_info(ask.collection)
