@@ -4,7 +4,7 @@ from typing import List
 from stargazeutils.common import export_table_csv, print_table
 
 from ..collection import NFTCollection
-from .market_ask import MarketAsk
+from .market_ask import MarketAsk, SaleType
 
 LOG = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class AskCollection:
                 return {"ask": ask, "token_info": self.token_info.tokens[token_id]}
         return None
 
-    def create_asks_by_trait(self) -> dict[str,dict[str,List[dict]]]:
+    def create_asks_by_trait(self, include_auctions: bool = True) -> dict[str,dict[str,List[dict]]]:
         """Creates a dictionary of  asks by trait
         including the metadata. The returning dictionary
         follows the pattern:
@@ -44,6 +44,7 @@ class AskCollection:
 
         The trait_value array of asks is sorted by price.
 
+        :param include_auctions Should the response include auctions?
         :return A dictionary as described above
         """
 
@@ -62,7 +63,9 @@ class AskCollection:
                     "description",
                     "dna",
                     "name",
-                    "hubble_rank",
+                    "rank",
+                    "score",
+                    "edition",
                 ]:
                     continue
 
@@ -70,7 +73,8 @@ class AskCollection:
                     trait_asks[trait] = {}
                 if value not in trait_asks[trait]:
                     trait_asks[trait][value] = []
-                trait_asks[trait][value].append(create_ask_trait(ask))
+                if include_auctions or ask.sale_type == SaleType.FIXED_PRICE:
+                    trait_asks[trait][value].append(create_ask_trait(ask))
 
         for t, tv in trait_asks.items():
             for u, v in tv.items():
