@@ -78,7 +78,7 @@ minted_tokens = client.query_num_minted_tokens()
 print(f"Minted tokens: {minted_tokens}")
 
 cache_dir = os.path.join(os.curdir, "cache", "collections")
-json_file = slugified(collection_name)
+json_file = slugified(collection_name) + ".json"
 json_trait_cache_file = os.path.join(cache_dir, json_file)
 
 print("")
