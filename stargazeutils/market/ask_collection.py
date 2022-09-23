@@ -21,6 +21,12 @@ class AskCollection:
         self.sg721 = asks[0].collection
         self.asks = asks
         self.token_info = token_info
+    
+    def get_token_ask(self, token_id: int):
+        for ask in self.asks:
+            if ask.token_id == token_id:
+                return {"ask": ask, "token_info": self.token_info.tokens[token_id]}
+        return None
 
     def create_asks_by_trait(self) -> dict[str,dict[str,List[dict]]]:
         """Creates a dictionary of  asks by trait
