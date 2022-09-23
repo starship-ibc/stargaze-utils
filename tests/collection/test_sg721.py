@@ -15,8 +15,8 @@ def test_sg721_client_should_fetch_tokens_owned_by(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
     sg_client.query_contract.side_effect = [
-        {"data": {"tokens": [1, 2, 3]}},
-        {"data": {"tokens": []}},
+        {"tokens": [1, 2, 3]},
+        {"tokens": []},
     ]
     tokens = client.query_tokens_owned_by(test_vals.owner)
 
@@ -35,7 +35,7 @@ def test_sg721_client_should_query_minter_config_once(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
     expected_minter_config = MinterConfig.from_data(test_vals.minter_config_data)
-    sg_client.query_contract.return_value = {"data": test_vals.minter_config_data}
+    sg_client.query_contract.return_value = test_vals.minter_config_data
 
     minter_config = client.query_minter_config()
     assert minter_config == expected_minter_config
@@ -52,7 +52,7 @@ def test_sg721_client_should_query_collection_info_once(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
     expected_collection_info = CollectionInfo.from_data(test_vals.collection_info_data)
-    sg_client.query_contract.return_value = {"data": test_vals.collection_info_data}
+    sg_client.query_contract.return_value = test_vals.collection_info_data
 
     collection_info = client.query_collection_info()
     assert collection_info == expected_collection_info
@@ -70,7 +70,7 @@ def test_sg721_client_should_query_whitelist_once(sg_client):
     client._minter_config = MinterConfig.from_data(test_vals.minter_config_data)
 
     expected_whitelist = Whitelist.from_data(test_vals.whitelist_data)
-    sg_client.query_contract.return_value = {"data": test_vals.whitelist_data}
+    sg_client.query_contract.return_value = test_vals.whitelist_data
 
     whitelist = client.query_whitelist()
     assert whitelist == expected_whitelist
@@ -96,9 +96,9 @@ def test_sg721_client_given_no_whitelist_when_query_whitelist_return_none(sg_cli
 def test_sg721_client_should_fetch_minted_tokens(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
     sg_client.query_contract.side_effect = [
-        {"data": {"tokens": [1, 2, 3]}},
-        {"data": {"tokens": [4, 5, 6]}},
-        {"data": {"tokens": []}},
+        {"tokens": [1, 2, 3]},
+        {"tokens": [4, 5, 6]},
+        {"tokens": []},
     ]
 
     tokens = client.fetch_minted_tokens(limit=3)
@@ -109,7 +109,7 @@ def test_sg721_client_should_fetch_minted_tokens(sg_client):
 def test_sg721_client_should_fetch_token_owner(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
-    sg_client.query_contract.return_value = {"data": {"owner": test_vals.owner}}
+    sg_client.query_contract.return_value = {"owner": test_vals.owner}
 
     owner = client.query_owner_of_token(1)
     assert owner == test_vals.owner
@@ -123,7 +123,7 @@ def test_sg721_client_should_fetch_token_owner(sg_client):
 def test_sg721_client_should_fetch_num_minted(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
-    sg_client.query_contract.return_value = {"data": {"count": 3}}
+    sg_client.query_contract.return_value = {"count": 3}
 
     assert client.query_num_minted_tokens() == 3
     sg_client.query_contract.assert_called_once_with(
@@ -135,7 +135,7 @@ def test_sg721_client_should_fetch_num_minted(sg_client):
 def test_sg721_client_should_query_contract_info(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
-    sg_client.query_contract.return_value = {"data": test_vals.sg721_contract_info_data}
+    sg_client.query_contract.return_value = test_vals.sg721_contract_info_data
 
     contract_info = client.query_contract_info()
     assert contract_info == test_vals.sg721_contract_info_data
@@ -164,10 +164,10 @@ def test_sg721_client_should_fetch_holders(sg_client):
     client = Sg721Client(test_vals.sg721_addr, test_vals.minter_addr, sg_client)
 
     sg_client.query_contract.side_effect = [
-        {"data": {"tokens": [1, 2, 3]}},
-        {"data": {"owner": "owner1", "approvals": []}},
-        {"data": {"owner": "owner2", "approvals": []}},
-        {"data": {"owner": "owner1", "approvals": []}},
+        {"tokens": [1, 2, 3]},
+        {"owner": "owner1", "approvals": []},
+        {"owner": "owner2", "approvals": []},
+        {"owner": "owner1", "approvals": []},
     ]
 
     holders = client.fetch_holders()

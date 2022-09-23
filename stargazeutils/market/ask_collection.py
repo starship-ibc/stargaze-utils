@@ -1,9 +1,12 @@
+import logging
 from typing import List
 
 from stargazeutils.common import export_table_csv, print_table
 
 from ..collection import NFTCollection
 from .market_ask import MarketAsk
+
+LOG = logging.getLogger(__name__)
 
 
 class AskCollection:
@@ -18,8 +21,14 @@ class AskCollection:
         self.sg721 = asks[0].collection
         self.asks = asks
         self.token_info = token_info
+    
+    def get_token_ask(self, token_id: int):
+        for ask in self.asks:
+            if ask.token_id == token_id:
+                return {"ask": ask, "token_info": self.token_info.tokens[token_id]}
+        return None
 
-    def create_asks_by_trait(self) -> dict:
+    def create_asks_by_trait(self) -> dict[str,dict[str,List[dict]]]:
         """Creates a dictionary of  asks by trait
         including the metadata. The returning dictionary
         follows the pattern:
@@ -37,6 +46,10 @@ class AskCollection:
 
         :return A dictionary as described above
         """
+
+        def create_ask_trait(ask: MarketAsk):
+            return {"ask": ask, "token_info": self.token_info.tokens[ask.token_id]}
+
         trait_asks = {}
         for ask in self.asks:
             id = ask.token_id
@@ -57,11 +70,21 @@ class AskCollection:
                     trait_asks[trait] = {}
                 if value not in trait_asks[trait]:
                     trait_asks[trait][value] = []
-                trait_asks[trait][value].append({"ask": ask, "token_info": token_info})
+                trait_asks[trait][value].append(create_ask_trait(ask))
 
         for t, tv in trait_asks.items():
             for u, v in tv.items():
                 v.sort(key=lambda x: x["ask"].price)
+
+        if len(trait_asks) == 0 and len(self.asks) > 0:
+            LOG.info("No traits. Showing only floor prices")
+
+            trait_asks["all"] = {
+                "all": [
+                    create_ask_trait(a)
+                    for a in sorted(self.asks, key=lambda a: a.price)
+                ]
+            }
 
         return trait_asks
 

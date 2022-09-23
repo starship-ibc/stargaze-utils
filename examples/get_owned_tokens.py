@@ -4,7 +4,7 @@ import argparse
 import os
 
 from stargazeutils.collection import Sg721Client
-from stargazeutils.common import print_table
+from stargazeutils.common import print_table, slugified
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -60,7 +60,7 @@ print(f"Owner: {owner_addr}")
 print(f"Owned tokens: {len(tokens)}")
 
 cache_dir = os.path.join(os.curdir, "cache", "collections")
-json_file = collection_name.lower().replace(" ", "-") + ".json"
+json_file = slugified(collection_name)
 json_trait_cache_file = os.path.join(cache_dir, json_file)
 
 print("")

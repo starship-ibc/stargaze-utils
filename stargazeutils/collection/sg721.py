@@ -4,6 +4,7 @@ from typing import List, Set
 
 from stargazeutils.collection.nft_collection import NFTCollection
 
+from ..errors.query_error import QueryError, QueryErrorType
 from ..ipfs import IpfsClient
 from ..stargaze import StargazeClient
 from .collection_info import CollectionInfo
@@ -97,7 +98,7 @@ class Sg721Client:
         Arguments:
         - query: The cosmwasm query dictionary.
         """
-        return self.sg_client.query_contract(self.sg721, query)["data"]
+        return self.sg_client.query_contract(self.sg721, query)
 
     def query_minter(self, query):
         """Queries the minter address with a given cosmwasm query. Returns
@@ -106,7 +107,7 @@ class Sg721Client:
         Arguments:
         - query: The cosmwasm query dictionary.
         """
-        return self.sg_client.query_contract(self.minter, query)["data"]
+        return self.sg_client.query_contract(self.minter, query)
 
     def query_tokens_owned_by(self, owner: str) -> List[int]:
         """Queries the tokens owned by a given address. Returns a string
@@ -159,9 +160,7 @@ class Sg721Client:
             wl_contract = self.query_minter_config().whitelist
             if wl_contract is None:
                 return None
-            whitelist_data = self.sg_client.query_contract(wl_contract, {"config": {}})[
-                "data"
-            ]
+            whitelist_data = self.sg_client.query_contract(wl_contract, {"config": {}})
             self._whitelist_config = Whitelist.from_data(whitelist_data)
         return self._whitelist_config
 

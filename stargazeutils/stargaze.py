@@ -7,7 +7,8 @@ from typing import List
 
 import requests
 
-from stargazeutils.cache.sg721_cache import SG721Cache, SG721Info
+from .errors.query_error import QueryError, QueryErrorType
+from .cache.sg721_cache import SG721Cache, SG721Info
 
 LOG = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class StargazeClient:
     def __init__(
         self,
         node: str = "https://rpc.stargaze-apis.com:443/",
-        chain_id: str = "stargaze",
+        chain_id: str = "stargaze-1",
         rest_url: str = "https://rest.stargaze-apis.com",
         query_method: QueryMethod = QueryMethod.BINARY,
         sg721_cache: SG721Cache = None,
@@ -107,9 +108,20 @@ class StargazeClient:
                 contract,
                 json.dumps(query),
             ] + self._query_suffix
-            return StargazeClient._get_json(cmd)
+            response = StargazeClient._get_json(cmd)
+        else:
+            response = self._query_rest_contract(contract, query)
+        
+        if 'data' not in response:
+            LOG.warning(f"No data in response to contract '{contract}' '{query}'")
+            LOG.warning(f"response = {response}")
 
-        return self._query_rest_contract(contract, query)
+            error = QueryError(contract, query, response)
+            if error.error_type == QueryErrorType.TOKEN_INFO_EMPTY:
+                LOG.warning(f"TokenInfo empty. Possibly we are querying a burnt token id.")
+            raise error
+        
+        return response['data']
 
     def get_sg721_info(self, collection_name) -> SG721Info:
         return self._sg721_cache.get_sg721_info_from_name(collection_name)
@@ -173,8 +185,8 @@ class StargazeClient:
         """
         if self._sg721_cache.has_sg721_info(sg721):
             return self._sg721_cache.get_sg721_info(sg721)
-        data = self.query_contract(sg721, {"contract_info": {}})["data"]
-        return self._sg721_cache.update_sg721_contract_info(sg721, data)
+        r = self.query_contract(sg721, {"contract_info": {}})
+        return self._sg721_cache.update_sg721_contract_info(sg721, r)
 
     def fetch_sg721_minter(self, sg721: str) -> SG721Info:
         """Fetch the SG721 contract minter's address for a given SG721
@@ -187,7 +199,7 @@ class StargazeClient:
         - sg721: The SG721 contract address"""
         if self._sg721_cache.has_sg721_minter(sg721):
             return self._sg721_cache.get_sg721_info(sg721)
-        minter = self.query_contract(sg721, {"minter": {}})["data"]["minter"]
+        minter = self.query_contract(sg721, {"minter": {}})["minter"]
         return self._sg721_cache.update_sg721_minter(sg721, minter)
 
     def update_sg721_cache(self, sg721_code=1) -> List[dict]:

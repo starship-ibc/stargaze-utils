@@ -18,6 +18,11 @@ def timestamp_from_str(ts):
     return datetime.utcfromtimestamp(float(Decimal(ts) / 1000000000))
 
 
+def slugified(s):
+    """Returns the string in an easily compariable and usable format without spaces"""
+    return s.lower().replace(" ", "-")
+
+
 def print_table(
     table: List[List], header: str = None, footer: str = None, delimiter="|"
 ):

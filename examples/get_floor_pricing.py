@@ -4,8 +4,10 @@ import argparse
 import os
 
 from stargazeutils.collection import Sg721Client
-from stargazeutils.common import export_table_csv, print_table
+from stargazeutils.coin import Coin
+from stargazeutils.common import export_table_csv, print_table, slugified
 from stargazeutils.market import MarketClient
+from stargazeutils.market.ask_collection import AskCollection
 from stargazeutils.market.market_ask import DEFAULT_MARKET_CONTRACT
 
 parser = argparse.ArgumentParser(
@@ -46,12 +48,11 @@ parser.add_argument(
 )
 
 
-def get_floor_pricing_table(
+def fetch_asks_for_collection(
     collection_name: str,
     strict_validation: bool = True,
-    num_prices: int = 3,
-    market_contract: str = DEFAULT_MARKET_CONTRACT,
-) -> dict:
+    market_contract: str = DEFAULT_MARKET_CONTRACT
+):
     print(f"Collection name: {collection_name}")
     print(f"Strict: {strict_validation}")
 
@@ -59,7 +60,7 @@ def get_floor_pricing_table(
     client = Sg721Client.from_collection_name(collection_name)
 
     cache_dir = os.path.join(os.curdir, "cache", "collections")
-    json_file = collection_name.lower().replace(" ", "-") + ".json"
+    json_file = slugified(collection_name) + ".json"
     json_trait_cache_file = os.path.join(cache_dir, json_file)
 
     print("")
@@ -67,9 +68,11 @@ def get_floor_pricing_table(
     collection.export_json(json_trait_cache_file)
     print(f"Trait cache file stored at {json_trait_cache_file}")
 
-    asks = market.fetch_asks_for_collection(collection, strict_verify=strict_validation)
-    trait_asks = asks.create_asks_by_trait()
+    return market.fetch_asks_for_collection(collection, strict_verify=strict_validation)
+    
 
+
+def get_floor_pricing_table(trait_asks, num_prices: int = 3):
     table = [
         [
             "Trait",
@@ -85,9 +88,10 @@ def get_floor_pricing_table(
     ]
     expected_length = 3 + (num_prices * 2)
     for trait, values in trait_asks.items():
-        if trait in ["hubble_rank", "id", "image", "name"]:
+        if trait in ["hubble_rank", "id", "image", "name", "Identity Number", "edition", "score", "rank"]:
             continue
-        for value, asks in values.items():
+        
+        for value, asks in sorted(values.items(), key=lambda i: i[1][0]['ask'].price):
             row = [trait, value, str(len(asks))]
             for ask in asks[:num_prices]:
                 row.extend([str(ask["ask"].price), str(ask["ask"].token_id)])
@@ -95,15 +99,50 @@ def get_floor_pricing_table(
             table.append(row)
     return table
 
+def token_pricing_table(asks: AskCollection, token_id: int):
+    ask = asks.get_token_ask(token_id)
+    if not ask:
+        print(f"Token {token_id} not listed")
+        return
+    
+    table = [["Trait", "Value", "Price 1", "Token 1", "Price 2", "Token 2", "Price 3", "Token 3", "Price 4", "Token 4"]]
+    trait_asks = asks.create_asks_by_trait()
+    for trait,value in ask['token_info'].items():
+        traits = trait_asks.get(trait)
+        if trait in ["id", "name", "image", "description"]:
+            continue
+        if not traits:
+            print(f"- Didn't find trait {trait}")
+            continue
+        values = traits.get(value)
+        if not values:
+            print(f"- Didn't find value {value} in trait {trait}")
+            continue
+        row = [trait, value]
+        for v_ask in values[:4]:
+            diff = Coin.from_ustars(ask['ask'].price.amount - v_ask['ask'].price.amount)
+            if diff.amount < 0:
+                diff = Coin.from_ustars(-diff.amount)
+                row.append(f"+{str(diff)}")
+            else:
+                row.append(f"-{str(diff)}")
+            row.append(v_ask['ask'].token_id)
+            
+        table.append(row)
+    return table
 
-args = parser.parse_args()
-collection_name = args.collection
 
-table = get_floor_pricing_table(collection_name, args.strict)
+if __name__ == "__main__":
+    args = parser.parse_args()
+    collection_name = args.collection
 
-if args.output == "csv":
-    csv_file = collection_name.lower().replace(" ", "-") + ".csv"
-    export_table_csv(table, csv_file)
-    exit(0)
+    asks = fetch_asks_for_collection(collection_name, args.strict)
+    trait_asks = asks.create_asks_by_trait()
+    table = get_floor_pricing_table(trait_asks, num_prices=3)
 
-print_table(table)
+    if args.output == "csv":
+        csv_file = slugified(collection_name) + ".csv"
+        export_table_csv(table, csv_file)
+        exit(0)
+
+    print_table(table)

@@ -7,6 +7,7 @@ import os
 import requests_cache
 
 from stargazeutils.collection.sg721 import Sg721Client
+from stargazeutils.common import slugified
 from stargazeutils.ipfs import IpfsClient
 from stargazeutils.stargaze import StargazeClient
 
@@ -62,6 +63,7 @@ requests_cache.install_cache("stargaze-ipfs")
 sg_client = StargazeClient()
 ipfs_client = IpfsClient(ipfs_root)
 client = Sg721Client.from_collection_name(collection_name, sg_client, ipfs_client)
+print(client.query_contract_info())
 
 if client is None:
     print(f"Collection '{collection_name}' not found.")
@@ -76,7 +78,7 @@ minted_tokens = client.query_num_minted_tokens()
 print(f"Minted tokens: {minted_tokens}")
 
 cache_dir = os.path.join(os.curdir, "cache", "collections")
-json_file = collection_name.lower().replace(" ", "-") + ".json"
+json_file = slugified(collection_name) + ".json"
 json_trait_cache_file = os.path.join(cache_dir, json_file)
 
 print("")

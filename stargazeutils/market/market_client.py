@@ -3,10 +3,11 @@ from typing import List
 
 from stargazeutils.market.ask_collection import AskCollection
 
+from ..errors import QueryError
 from ..collection import NFTCollection
 from ..common import DEFAULT_MARKET_CONTRACT
 from ..stargaze import StargazeClient
-from .market_ask import MarketAsk
+from .market_ask import MarketAsk, SaleType
 from .market_sale import MarketSale
 from .unstable_helper import fetch_unstable_paged_data
 
@@ -35,6 +36,45 @@ class MarketClient:
         - query: The market contract query"""
         return self.sg_client.query_contract(self.contract, query)
 
+    def query_floor_price(self, sg721: str, count: int = 30) -> List[MarketAsk]:
+        query = {
+            "asks_sorted_by_price": {
+                "collection": sg721,
+                "limit": count,
+            }
+        }
+        asks = self.query_market(query)["asks"]
+
+        # Always strict verify because we shouldn't need to make many calls.
+        for ask_dict in asks:
+            ask = MarketAsk.from_dict(ask_dict)
+
+            # Ignore auction floors
+            if ask.sale_type != SaleType.FIXED_PRICE:
+                LOG.warning(f"Ignoring {ask.sale_type} ask for token {ask.token_id}")
+                continue
+
+            # This should usually be a cached call.
+            contract_info = self.sg_client.fetch_sg721_contract_info(ask.collection)
+            ask.collection_name = contract_info.name
+
+            owner_query = {"owner_of": {"token_id": str(ask.token_id)}}
+
+            try:
+                owner = self.sg_client.query_contract(ask.collection, owner_query)
+            except QueryError as e:
+                LOG.warning("Possilble burnt token on the floor")
+                LOG.warning(f"{ask.collection} ({ask.collection_name}) #{ask.token_id}")
+                continue
+
+            ask.owner = owner["owner"]
+            ask.approvals = owner["approvals"]
+            if ask.is_valid(self.contract):
+                return ask
+
+        LOG.warning(f"Valid ask not found within the first {count} results")
+        return None
+
     def fetch_bids_by_bidder(self, bidder: str) -> dict:
         """Fetches all bids for a given bidder.
 
@@ -52,7 +92,7 @@ class MarketClient:
         - token_id: The token to query"""
         LOG.info(f"Looking up ask for token: {token_id}")
         query = {"ask": {"collection": sg721, "token_id": token_id}}
-        ask = self.query_market(query)["data"]["ask"]
+        ask = self.query_market(query)["ask"]
         if ask is None:
             return None
 
@@ -64,7 +104,7 @@ class MarketClient:
     #     Arguments:
     #     - sg721: The sg721 address to check"""
     #     query = {"ask_count": {"collection": sg721}}
-    #     return self.query_market(query)["data"]["count"]
+    #     return self.query_market(query)["count"]
 
     # def remove_bid(self, sg721: str, token_id: int, wallet: str):
     #     cmd = {"remove_bid": {"collection": sg721, "token_id": token_id}}
@@ -94,7 +134,7 @@ class MarketClient:
                 "limit": limit,
             }
         }
-        asks = self.query_market(query)["data"]["asks"]
+        asks = self.query_market(query)["asks"]
 
         while len(asks) > 0:
             LOG.info(f"Querying asks after {start_after}")
@@ -104,7 +144,7 @@ class MarketClient:
                 if ask.is_valid(self.contract) and strict_verify:
                     owner = self.sg_client.query_contract(
                         ask.collection, {"owner_of": {"token_id": str(ask.token_id)}}
-                    )["data"]
+                    )
                     ask.owner = owner["owner"]
                     ask.approvals = owner["approvals"]
 
@@ -119,7 +159,7 @@ class MarketClient:
                     "limit": limit,
                 }
             }
-            asks = self.query_market(query)["data"]["asks"]
+            asks = self.query_market(query)["asks"]
 
         return AskCollection(collection_asks, nft_collection)
 

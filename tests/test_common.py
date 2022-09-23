@@ -1,6 +1,6 @@
 import os
 
-from stargazeutils.common import export_table_csv, print_table
+from stargazeutils.common import export_table_csv, print_table, slugified
 
 
 def test_print_table(capsys):
@@ -76,3 +76,10 @@ def test_export_csv():
         os.remove(filename)
 
     assert not os.path.exists(filename)
+
+
+def test_slugified():
+    s1 = "Hello Collection"
+    s2 = slugified(s1)
+
+    assert s2 == "hello-collection"
