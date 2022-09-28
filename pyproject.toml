@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stargazeutils"
-version = "0.6.0"
+version = "1.0.1"
 description = ""
 authors = ["Starship IBC <shrugs.rest0x@icloud.com>"]
 
