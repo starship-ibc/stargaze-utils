@@ -6,7 +6,7 @@ from typing import List
 from .coin import Coin
 from .collection import Sg721Client
 from .common import str_from_timestamp
-from .market import MarketAsk, MarketClient
+from .market import MarketAsk, MarketClient, SaleType
 
 LOG = logging.getLogger(__name__)
 
@@ -120,10 +120,10 @@ class Wallet:
 
     def set_bid_from_ask(self, ask: MarketAsk, auto_sign: bool = False):
         """Sets a bid to purchase an ask."""
-        return self.set_bid(ask.collection, ask.token_id, ask.price, auto_sign)
+        return self.set_bid(ask.collection, ask.token_id, ask.price, ask.sale_type, auto_sign)
 
     def set_bid(
-        self, collection: str, token_id: int, price: Coin, auto_sign: bool = False
+        self, collection: str, token_id: int, price: Coin, sale_type: SaleType, auto_sign: bool = False
     ):
         """Sets a bid for a token in a specific collection at a given price."""
         LOG.info(
@@ -134,6 +134,7 @@ class Wallet:
             "set_bid": {
                 "collection": collection,
                 "token_id": int(token_id),
+                "sale_type": sale_type.name.lower(),
                 "expires": str_from_timestamp(datetime.utcnow() + timedelta(days=5)),
             }
         }
