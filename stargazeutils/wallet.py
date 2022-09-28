@@ -76,11 +76,16 @@ class Wallet:
         for token in tokens:
             coins.append(Coin(token["amount"], token["denom"]))
         return coins
-
-    def query_owned_tokens(self, collection):
-        """Queries for the tokens in a collection owned by the wallet."""
-        client = Sg721Client(collection, sg_client=self.sg_client)
-        return client.query_tokens_owned_by(self.address)
+    
+    def query_owned_tokens(self, collections: List[str] = []):
+        """Queries for the tokens in a set of collections owned by the wallet."""
+        owned_tokens = {}
+        for collection in collections:
+            client = Sg721Client(collection, sg_client=self.sg_client)
+            tokens = client.query_tokens_owned_by(self.address)
+            owned_tokens[collection] = tokens
+        
+        return owned_tokens
 
     def _execute_wasm(
         self, contract: str, query: dict, amount: Coin = None, auto_sign: bool = False
