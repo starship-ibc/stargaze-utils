@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import List
 
 from .sg721_info import SG721Info
 
@@ -17,7 +18,7 @@ class SG721Cache:
     def __init__(self, cache_file="cache/sg721_collections.csv"):
         """Initializes the cache with a given CSV file."""
         self.cache_file = cache_file
-        self._sg721 = {}
+        self._sg721: dict[str,SG721Info] = {}
 
         self._load_csv()
 
@@ -25,7 +26,7 @@ class SG721Cache:
         if not os.path.exists(self.cache_file):
             return
 
-        self._sg721 = {}
+        self._sg721: dict[str,SG721Info] = {}
         lines = []
 
         with open(self.cache_file) as f:
