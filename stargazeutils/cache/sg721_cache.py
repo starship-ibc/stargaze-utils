@@ -144,3 +144,18 @@ class SG721Cache:
         info.minter = minter_addr
         self._sg721[sg721_addr] = info
         return info
+
+    def get_sg721s(self, names: List[str] = None):
+        """Returns the sg721 for a list of named collections. If not, then
+        all sg721 addresses will be returned."""
+
+        if names is None:
+            return list(self._sg721.keys())
+
+        sg721s = []
+        for sg721,info in self._sg721.items():
+            if info.name in names:
+                names.remove(info.name)
+                sg721s.append(sg721)
+        
+        return sg721s
