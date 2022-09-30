@@ -61,6 +61,7 @@ ipfs_root = args.ipfs or os.environ.get(
 
 requests_cache.install_cache("stargaze-ipfs")
 sg_client = StargazeClient()
+print(ipfs_root)
 ipfs_client = IpfsClient(ipfs_root)
 client = Sg721Client.from_collection_name(collection_name, sg_client, ipfs_client)
 print(client.query_contract_info())
@@ -88,3 +89,5 @@ print(f"Trait cache file stored at {json_trait_cache_file}")
 
 print("")
 traits.print_trait_rarity()
+
+traits.export_csv(f"{slugified(collection_name)}.csv")
