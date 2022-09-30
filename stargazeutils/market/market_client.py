@@ -53,6 +53,10 @@ class MarketClient:
             if ask.sale_type != SaleType.FIXED_PRICE:
                 LOG.warning(f"Ignoring {ask.sale_type} ask for token {ask.token_id}")
                 continue
+        
+            if ask.reserve_for is None or ask.reserve_for == "":
+                LOG.warning(f"Ignoring RESERVED listing for token {ask.token_id}")
+                continue
 
             # This should usually be a cached call.
             contract_info = self.sg_client.fetch_sg721_contract_info(ask.collection)

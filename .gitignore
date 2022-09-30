@@ -2,6 +2,8 @@
 *.sqlite
 cache/collections/
 examples-2/
+*.csv
+*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
