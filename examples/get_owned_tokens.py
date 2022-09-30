@@ -21,7 +21,7 @@ poetry run python examples/get_owned_tokens.py \
     "Stargaze Punks" \
     stars1zja6krwtcaa2ushn3z2m658k38qlg9qwg8casg \
     --excluded_traits image name Glow Eyes Hair Mouth Bubble \
-    --sort hubble_rank
+    --sort rank
 """,
 )
 parser.add_argument(
