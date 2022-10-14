@@ -34,9 +34,9 @@ asks = [
 token_info = NFTCollection(
     test_vals.sg721_addr,
     [
-        {"id": 1, "type": "Grass", "hubble_rank": 2},
-        {"id": 2, "type": "Grass", "hubble_rank": 2},
-        {"id": 4, "type": "Fire", "hubble_rank": 1},
+        {"id": 1, "type": "Grass", "rank": 2},
+        {"id": 2, "type": "Grass", "rank": 2},
+        {"id": 4, "type": "Fire", "rank": 1},
     ],
 )
 
