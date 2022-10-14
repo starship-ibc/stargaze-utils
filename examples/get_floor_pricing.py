@@ -5,7 +5,12 @@ import os
 
 from stargazeutils.coin import Coin
 from stargazeutils.collection import Sg721Client
-from stargazeutils.common import IGNORED_TRAITS, export_table_csv, print_table, slugified
+from stargazeutils.common import (
+    IGNORED_TRAITS,
+    export_table_csv,
+    print_table,
+    slugified,
+)
 from stargazeutils.market import MarketClient
 from stargazeutils.market.ask_collection import AskCollection
 from stargazeutils.market.market_ask import DEFAULT_MARKET_CONTRACT
