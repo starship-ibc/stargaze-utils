@@ -36,7 +36,7 @@ class MarketClient:
         - query: The market contract query"""
         return self.sg_client.query_contract(self.contract, query)
 
-    def query_floor_price(self, sg721: str, count: int = 30) -> List[MarketAsk]:
+    def query_floor_price(self, sg721: str, count: int = 100) -> List[MarketAsk]:
         query = {
             "asks_sorted_by_price": {
                 "collection": sg721,
@@ -54,7 +54,7 @@ class MarketClient:
                 LOG.warning(f"Ignoring {ask.sale_type} ask for token {ask.token_id}")
                 continue
         
-            if ask.reserve_for is None or ask.reserve_for == "":
+            if ask.reserve_for is not None:
                 LOG.warning(f"Ignoring RESERVED listing for token {ask.token_id}")
                 continue
 
