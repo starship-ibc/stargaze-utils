@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from stargazeutils.common import export_table_csv, print_table
+from stargazeutils.common import IGNORED_TRAITS, export_table_csv, print_table
 
 from ..collection import NFTCollection
 from .market_ask import MarketAsk, SaleType
@@ -21,14 +21,16 @@ class AskCollection:
         self.sg721 = asks[0].collection
         self.asks = asks
         self.token_info = token_info
-    
+
     def get_token_ask(self, token_id: int):
         for ask in self.asks:
             if ask.token_id == token_id:
                 return {"ask": ask, "token_info": self.token_info.tokens[token_id]}
         return None
 
-    def create_asks_by_trait(self, include_auctions: bool = True) -> dict[str,dict[str,List[dict]]]:
+    def create_asks_by_trait(
+        self, include_auctions: bool = True
+    ) -> dict[str, dict[str, List[dict]]]:
         """Creates a dictionary of  asks by trait
         including the metadata. The returning dictionary
         follows the pattern:
@@ -140,7 +142,7 @@ class AskCollection:
             ["Trait", "Value", "Num Listings", "Min Price", "Avg Price", "Max Price"]
         ]
         for trait, values in self.token_info.traits.items():
-            if trait in ["token_id", "image", "hubble_rank", "dna", "description"]:
+            if trait in IGNORED_TRAITS:
                 continue
 
             for value, tokens in values.items():

@@ -8,6 +8,20 @@ DEFAULT_MARKET_CONTRACT = (
     "stars1fvhcnyddukcqfnt7nlwv3thm5we22lyxyxylr9h77cvgkcn43xfsvgv0pl"
 )
 
+IGNORED_TRAITS = [
+    "token_id",
+    "image",
+    "hubble_rank",
+    "dna",
+    "description",
+    "rank",
+    "edition",
+    "id",
+    "Identity Number",
+    "score",
+    "name",
+]
+
 
 def str_from_timestamp(ts):
     return str(int((ts - EPOCH).total_seconds() * 1000)) + "000000"

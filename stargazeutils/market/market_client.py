@@ -3,9 +3,9 @@ from typing import List
 
 from stargazeutils.market.ask_collection import AskCollection
 
-from ..errors import QueryError
 from ..collection import NFTCollection
 from ..common import DEFAULT_MARKET_CONTRACT
+from ..errors import QueryError
 from ..stargaze import StargazeClient
 from .market_ask import MarketAsk, SaleType
 from .market_sale import MarketSale
@@ -53,7 +53,7 @@ class MarketClient:
             if ask.sale_type != SaleType.FIXED_PRICE:
                 LOG.warning(f"Ignoring {ask.sale_type} ask for token {ask.token_id}")
                 continue
-        
+
             if ask.reserve_for is not None:
                 LOG.warning(f"Ignoring RESERVED listing for token {ask.token_id}")
                 continue
@@ -69,6 +69,7 @@ class MarketClient:
             except QueryError as e:
                 LOG.warning("Possilble burnt token on the floor")
                 LOG.warning(f"{ask.collection} ({ask.collection_name}) #{ask.token_id}")
+                LOG.warning(e)
                 continue
 
             ask.owner = owner["owner"]

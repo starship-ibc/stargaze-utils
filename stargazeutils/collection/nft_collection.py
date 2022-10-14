@@ -2,7 +2,7 @@ import json
 import logging
 from typing import List, Set
 
-from stargazeutils.common import export_table_csv, print_table
+from stargazeutils.common import IGNORED_TRAITS, export_table_csv, print_table
 
 LOG = logging.getLogger(__name__)
 
@@ -140,24 +140,15 @@ class NFTCollection:
         traits = {}
         for token in self.tokens.values():
             for trait in token.keys():
-                if trait not in [
-                    "id",
-                    "name",
-                    "image",
-                    "edition",
-                    "description",
-                    "dna",
-                    "hubble_rank",
-                    "Identity Number",
-                    "score",
-                    "rank",
-                ]:
-                    if trait not in traits:
-                        traits[trait] = {token[trait]: 1}
-                    elif token[trait] not in traits[trait]:
-                        traits[trait][token[trait]] = 1
-                    else:
-                        traits[trait][token[trait]] += 1
+                if trait in IGNORED_TRAITS:
+                    continue
+
+                if trait not in traits:
+                    traits[trait] = {token[trait]: 1}
+                elif token[trait] not in traits[trait]:
+                    traits[trait][token[trait]] = 1
+                else:
+                    traits[trait][token[trait]] += 1
 
         return traits
 

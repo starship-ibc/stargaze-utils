@@ -76,7 +76,7 @@ class Wallet:
         for token in tokens:
             coins.append(Coin(token["amount"], token["denom"]))
         return coins
-    
+
     def query_owned_tokens(self, collections: List[str] = []):
         """Queries for the tokens in a set of collections owned by the wallet."""
         owned_tokens = {}
@@ -84,7 +84,7 @@ class Wallet:
             client = Sg721Client(collection, sg_client=self.sg_client)
             tokens = client.query_tokens_owned_by(self.address)
             owned_tokens[collection] = tokens
-        
+
         return owned_tokens
 
     def _execute_wasm(
@@ -125,10 +125,17 @@ class Wallet:
 
     def set_bid_from_ask(self, ask: MarketAsk, auto_sign: bool = False):
         """Sets a bid to purchase an ask."""
-        return self.set_bid(ask.collection, ask.token_id, ask.price, ask.sale_type, auto_sign)
+        return self.set_bid(
+            ask.collection, ask.token_id, ask.price, ask.sale_type, auto_sign
+        )
 
     def set_bid(
-        self, collection: str, token_id: int, price: Coin, sale_type: SaleType, auto_sign: bool = False
+        self,
+        collection: str,
+        token_id: int,
+        price: Coin,
+        sale_type: SaleType,
+        auto_sign: bool = False,
     ):
         """Sets a bid for a token in a specific collection at a given price."""
         LOG.info(

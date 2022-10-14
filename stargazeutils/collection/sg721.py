@@ -4,7 +4,6 @@ from typing import List, Set
 
 from stargazeutils.collection.nft_collection import NFTCollection
 
-from ..errors.query_error import QueryError, QueryErrorType
 from ..ipfs import IpfsClient
 from ..stargaze import StargazeClient
 from .collection_info import CollectionInfo
