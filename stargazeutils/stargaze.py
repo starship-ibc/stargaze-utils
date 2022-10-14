@@ -7,8 +7,8 @@ from typing import List
 
 import requests
 
-from .errors.query_error import QueryError, QueryErrorType
 from .cache.sg721_cache import SG721Cache, SG721Info
+from .errors.query_error import QueryError, QueryErrorType
 
 LOG = logging.getLogger(__name__)
 
@@ -111,17 +111,19 @@ class StargazeClient:
             response = StargazeClient._get_json(cmd)
         else:
             response = self._query_rest_contract(contract, query)
-        
-        if 'data' not in response:
+
+        if "data" not in response:
             LOG.warning(f"No data in response to contract '{contract}' '{query}'")
             LOG.warning(f"response = {response}")
 
             error = QueryError(contract, query, response)
             if error.error_type == QueryErrorType.TOKEN_INFO_EMPTY:
-                LOG.warning(f"TokenInfo empty. Possibly we are querying a burnt token id.")
+                LOG.warning(
+                    "TokenInfo empty. Possibly we are querying a burnt token id."
+                )
             raise error
-        
-        return response['data']
+
+        return response["data"]
 
     def get_sg721_info(self, collection_name) -> SG721Info:
         return self._sg721_cache.get_sg721_info_from_name(collection_name)

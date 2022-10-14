@@ -39,7 +39,7 @@ def mock_starsd(*args, **kwargs):
 
 @mock.patch("subprocess.check_output")
 def test_stargazeclient_can_query_contract_via_binary(mock: MagicMock):
-    mock.return_value = "{\"data\": {}}"
+    mock.return_value = '{"data": {}}'
 
     cache = SG721Cache(cache_file)
     client = StargazeClient(query_method=QueryMethod.BINARY, sg721_cache=cache)

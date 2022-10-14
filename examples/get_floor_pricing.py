@@ -3,9 +3,14 @@
 import argparse
 import os
 
-from stargazeutils.collection import Sg721Client
 from stargazeutils.coin import Coin
-from stargazeutils.common import export_table_csv, print_table, slugified
+from stargazeutils.collection import Sg721Client
+from stargazeutils.common import (
+    IGNORED_TRAITS,
+    export_table_csv,
+    print_table,
+    slugified,
+)
 from stargazeutils.market import MarketClient
 from stargazeutils.market.ask_collection import AskCollection
 from stargazeutils.market.market_ask import DEFAULT_MARKET_CONTRACT
@@ -51,7 +56,7 @@ parser.add_argument(
 def fetch_asks_for_collection(
     collection_name: str,
     strict_validation: bool = True,
-    market_contract: str = DEFAULT_MARKET_CONTRACT
+    market_contract: str = DEFAULT_MARKET_CONTRACT,
 ):
     print(f"Collection name: {collection_name}")
     print(f"Strict: {strict_validation}")
@@ -69,7 +74,6 @@ def fetch_asks_for_collection(
     print(f"Trait cache file stored at {json_trait_cache_file}")
 
     return market.fetch_asks_for_collection(collection, strict_verify=strict_validation)
-    
 
 
 def get_floor_pricing_table(trait_asks, num_prices: int = 3):
@@ -88,10 +92,10 @@ def get_floor_pricing_table(trait_asks, num_prices: int = 3):
     ]
     expected_length = 3 + (num_prices * 2)
     for trait, values in trait_asks.items():
-        if trait in ["hubble_rank", "id", "image", "name", "Identity Number", "edition", "score", "rank"]:
+        if trait in IGNORED_TRAITS:
             continue
-        
-        for value, asks in sorted(values.items(), key=lambda i: i[1][0]['ask'].price):
+
+        for value, asks in sorted(values.items(), key=lambda i: i[1][0]["ask"].price):
             row = [trait, value, str(len(asks))]
             for ask in asks[:num_prices]:
                 row.extend([str(ask["ask"].price), str(ask["ask"].token_id)])
@@ -99,15 +103,29 @@ def get_floor_pricing_table(trait_asks, num_prices: int = 3):
             table.append(row)
     return table
 
+
 def token_pricing_table(asks: AskCollection, token_id: int):
     ask = asks.get_token_ask(token_id)
     if not ask:
         print(f"Token {token_id} not listed")
         return
-    
-    table = [["Trait", "Value", "Price 1", "Token 1", "Price 2", "Token 2", "Price 3", "Token 3", "Price 4", "Token 4"]]
+
+    table = [
+        [
+            "Trait",
+            "Value",
+            "Price 1",
+            "Token 1",
+            "Price 2",
+            "Token 2",
+            "Price 3",
+            "Token 3",
+            "Price 4",
+            "Token 4",
+        ]
+    ]
     trait_asks = asks.create_asks_by_trait()
-    for trait,value in ask['token_info'].items():
+    for trait, value in ask["token_info"].items():
         traits = trait_asks.get(trait)
         if trait in ["id", "name", "image", "description"]:
             continue
@@ -120,14 +138,14 @@ def token_pricing_table(asks: AskCollection, token_id: int):
             continue
         row = [trait, value]
         for v_ask in values[:4]:
-            diff = Coin.from_ustars(ask['ask'].price.amount - v_ask['ask'].price.amount)
+            diff = Coin.from_ustars(ask["ask"].price.amount - v_ask["ask"].price.amount)
             if diff.amount < 0:
                 diff = Coin.from_ustars(-diff.amount)
                 row.append(f"+{str(diff)}")
             else:
                 row.append(f"-{str(diff)}")
-            row.append(v_ask['ask'].token_id)
-            
+            row.append(v_ask["ask"].token_id)
+
         table.append(row)
     return table
 
